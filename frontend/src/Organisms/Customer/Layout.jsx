@@ -12,6 +12,7 @@ import { Menu } from "baseui/icon";
 
 import BrandLogo from '../../Atoms/BrandLogo';
 import CartButton from '../../Molecule/CartButton';
+import DrawerMenu from '../../Molecule/DrawerMenu';
 
 const Layout = ({ children }) => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -25,7 +26,9 @@ const Layout = ({ children }) => {
             </Button>
           </NavigationItem>
           <NavigationItem>
-            <BrandLogo height="24px" />
+            <a href="/customer/dashboard">
+              <BrandLogo height="24px" />
+            </a>
           </NavigationItem>
         </NavigationList>
         <NavigationList $align={ALIGN.center} />
@@ -42,14 +45,11 @@ const Layout = ({ children }) => {
           </NavigationItem>
         </NavigationList>
       </HeaderNavigation>
-      <Drawer
+      <DrawerMenu
         onClose={() => setDrawerOpen(false)}
         isOpen={isDrawerOpen}
-        size="auto"
         anchor={ANCHOR.left}
-      >
-        lorem ipsum
-      </Drawer>
+      />
       {children}
     </>
   );
