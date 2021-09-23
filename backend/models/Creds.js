@@ -19,4 +19,21 @@ Creds.create = (creds) => {
   });
 }
 
+Creds.find = (creds) => {
+  return new Promise(resolve => {
+    db.query(
+      'select * from creds where email = ? and accountRole = ?',
+      [creds.email, creds.accountRole],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result[0]]);
+     }
+    );
+  });
+}
+
 export default Creds;

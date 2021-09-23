@@ -26,4 +26,21 @@ Customer.create = (customer) => {
   });
 }
 
+Customer.find = (customer) => {
+  return new Promise(resolve => {
+    db.query(
+      'select * from custProfile where credId=?',
+      [customer.credId],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result[0]]);
+      }
+    );
+  });
+}
+
 export default Customer;

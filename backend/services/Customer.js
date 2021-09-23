@@ -13,4 +13,14 @@ CustomerService.create = (query) => {
   return Customer.create(customer);
 }
 
+CustomerService.find = (query) => {
+  const { credId } = query;
+
+  const customer = new Customer({
+    credId
+  });
+
+  return Customer.find(customer);
+}
+
 export default CustomerService;
