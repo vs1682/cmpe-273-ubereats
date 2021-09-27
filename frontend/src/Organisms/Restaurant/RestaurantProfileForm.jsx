@@ -1,4 +1,6 @@
 import React from 'react';
+import _ from 'lodash';
+import { useHistory } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { useStyletron } from 'baseui';
 import { Input } from "baseui/input";
@@ -6,12 +8,23 @@ import { Button } from 'baseui/button';
 import { Textarea } from 'baseui/textarea';
 import { Cell, Grid } from 'baseui/layout-grid';
 
+import RestaurantApi from '../../api/restaurant';
 import Space from '../../Atoms/Space';
 
 const RestaurantProfileForm = () => {
+  const history = useHistory();
   const [css] = useStyletron();
   const { handleSubmit, control } = useForm();
-  const onSubmit = data => console.log(data);
+  const onSubmit = async (data) => {
+    const restaurant = JSON.parse(localStorage.getItem('user'));
+    const profile = await RestaurantApi.updateProfile({
+      ...restaurant, ..._.omitBy(data, v => !v)
+    });
+
+    if (profile) {
+      history.push('/restaurant');
+    }
+  }
 
   return (
     <div className={css({ padding: '64px' })}>
@@ -24,10 +37,9 @@ const RestaurantProfileForm = () => {
         <Grid>
           <Cell span={4}>
             <Controller
-              name="name"
+              name="fullname"
               control={control}
               defaultValue=""
-              rules={{ required: true }}
               render={({ field }) => <Input placeholder="Restaurant Name" {...field} />}
             />
           </Cell>
@@ -36,7 +48,6 @@ const RestaurantProfileForm = () => {
               name="location"
               control={control}
               defaultValue=""
-              rules={{ required: true }}
               render={({ field }) => <Input placeholder="Location" {...field} />}
             />
           </Cell>
@@ -47,7 +58,6 @@ const RestaurantProfileForm = () => {
             <Controller
               name="description"
               control={control}
-              rules={{ required: true }}
               render={({ field }) => <Textarea placeholder="Restaurant Description" {...field} />}
             />
           </Cell>
@@ -56,21 +66,9 @@ const RestaurantProfileForm = () => {
         <Grid>
           <Cell span={8}>
             <Controller
-              name="contactInfo"
+              name="phone"
               control={control}
-              rules={{ required: true }}
               render={({ field }) => <Textarea placeholder="Contact Information" {...field} />}
-            />
-          </Cell>
-        </Grid>
-        <Space />
-        <Grid>
-          <Cell span={8}>
-            <Controller
-              name="dishes"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => <Textarea placeholder="Dishes" {...field} />}
             />
           </Cell>
         </Grid>
@@ -80,7 +78,6 @@ const RestaurantProfileForm = () => {
             <Controller
               name="timings"
               control={control}
-              rules={{ required: true }}
               render={({ field }) => <Textarea placeholder="Timings" {...field} />}
             />
           </Cell>
@@ -88,7 +85,7 @@ const RestaurantProfileForm = () => {
         <Space />
         <Grid>
           <Cell span={8}>
-            <Button type="submit">Save Details</Button>
+            <Button>Save Details</Button>
           </Cell>
         </Grid>
       </form>

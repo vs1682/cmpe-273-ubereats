@@ -1,12 +1,8 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useStyletron } from 'baseui';
-import { Input } from "baseui/input";
 import { Button } from 'baseui/button';
-import { Textarea } from 'baseui/textarea';
 import { Cell, Grid } from 'baseui/layout-grid';
-import { DatePicker } from "baseui/datepicker";
-import { Select } from "baseui/select";
 import { FileUploader } from "baseui/file-uploader";
 
 import Space from '../../Atoms/Space';

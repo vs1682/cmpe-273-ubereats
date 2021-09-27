@@ -13,6 +13,7 @@ const MenuItem = styled('div', {
   display: 'flex',
   width: '200px',
   padding: '8px',
+  fontSize: '16px',
   fontWeight: '500'
 });
 
@@ -50,12 +51,12 @@ const DrawerMenu = ({ isOpen, onClose }) => {
     >
       <AccountMenuItem name="Vishal Shinde" />
       <MenuItem>
-        <img src={orderIcon} width="20px" height="20px" alt="order icon" />
+        <img src={orderIcon} width="24px" height="24px" alt="order icon" />
         <Space horizontal size={2} />
         Orders
       </MenuItem>
       <MenuItem>
-        <img src={favoriteIcon} width="20px" height="20px" alt="favorite icon" />
+        <img src={favoriteIcon} width="24px" height="24px" alt="favorite icon" />
         <Space horizontal size={2} />
         Favorite
       </MenuItem>
