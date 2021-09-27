@@ -24,4 +24,10 @@ RestaurantService.find = (query) => {
   return Restaurant.find(restaurant);
 }
 
+RestaurantService.update = (query) => {
+  const restaurant = new Restaurant(query);
+
+  return Restaurant.update(restaurant);
+}
+
 export default RestaurantService;

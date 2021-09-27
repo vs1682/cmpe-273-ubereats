@@ -23,6 +23,23 @@ Restaurant.create = (restaurant) => {
   });
 }
 
+Restaurant.update = (restaurant) => {
+  return new Promise(resolve => {
+    db.query(
+      'update restaurantProfile SET ? where credId=?',
+      [restaurant, restaurant.credId],
+      (err) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, restaurant]);
+      }
+    );
+  });
+}
+
 Restaurant.find = (restaurant) => {
   return new Promise(resolve => {
     db.query(

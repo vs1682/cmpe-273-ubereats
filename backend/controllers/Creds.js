@@ -37,7 +37,7 @@ CredsController.create = async (req, res) => {
       credId: data.id
     });
   }
-  
+
   if (profileErr) {
     res.status(500).send({
       message:
@@ -65,7 +65,7 @@ CredsController.signIn = async (req, res) => {
   if (err) {
     res.status(500).send({
       message:
-        err.message || "Some error occurred while creating the Creds."
+        err.message || "Some error occurred while signing in."
     });
   }
 

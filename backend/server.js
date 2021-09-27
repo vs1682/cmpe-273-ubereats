@@ -3,6 +3,8 @@ import bodyParser from 'body-parser';
 
 import authenticateTokenMiddleware from './middlewares/authentication.js';
 import credsRoutes from './routes/creds.js';
+import restaurantRoutes from './routes/restaurant.js';
+import dishRoutes from './routes/dish.js';
 
 const app = express();
 
@@ -13,12 +15,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  console.log('---REQUEST---', req.body);
+  if (req.method === 'POST') {
+    console.log('---REQUEST---', req.body);
+  } else {
+    console.log('---REQUEST QUERY---', req.query);
+    console.log('---REQUEST PARAM---', req.params);
+  }
 
   next();
 });
 
 app.use('/api/creds', credsRoutes);
+
+app.use('/api/restaurant', restaurantRoutes);
+
+app.use('/api/dish', dishRoutes);
 
 // set port, listen for requests
 app.listen(8000, () => {

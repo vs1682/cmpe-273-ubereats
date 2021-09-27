@@ -1,29 +1,66 @@
-import Restaurant from '../models/Restaurant.js';
+import RestaurantService from '../services/Restaurant.js';
 
 const RestaurantController = {};
 
-RestaurantController.create = (req, res) => {
+RestaurantController.create = async (req, res) => {
   if (!req.body) {
     res.status(400).send({
       message: "Required fields not present"
     });
   }
 
-  const { credId, fullname } = req.body;
+  const [err, data] = await RestaurantService.create(req.body);
 
-  const customer = new Restaurant({
-    credId,
-    fullname
-  });
+  if (err) {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while creating the Restaurant."
+    });
+  }
 
-  Restaurant.create(customer, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Restaurant."
-      });
-    else res.send(data);
-  });
+  res.json(data);
+}
+
+RestaurantController.findById = async (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const { id } = req.params;
+
+  const [err, data] = await RestaurantService.find({ credId: id });
+
+  if (err) {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while finding the Restaurant."
+    });
+  }
+
+  res.json(data);
+}
+
+RestaurantController.update = async (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const { id } = req.params;
+
+  const [err, data] = await RestaurantService.update({ credId: id, ...req.body });
+
+  if (err) {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while updating the Restaurant."
+    });
+  }
+
+  res.json(data);
 }
 
 export default RestaurantController;

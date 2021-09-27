@@ -43,4 +43,21 @@ Customer.find = (customer) => {
   });
 }
 
+Customer.update = (customer) => {
+  return new Promise(resolve => {
+    db.query(
+      'update custProfile SET ? where credId=?',
+      [customer, customer.credId],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result[0]]);
+      }
+    );
+  });
+}
+
 export default Customer;
