@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { useStyletron } from "baseui";
 import { Input } from "baseui/input";
@@ -11,22 +11,17 @@ import Centered from '../Atoms/Centered';
 import BrandLogo from '../Atoms/BrandLogo';
 import Space from '../Atoms/Space';
 
-import CredApi from '../api/creds';
-import { USER_TYPE, LOCAL_STORE_KEYS } from '../utils/constants';
+import { USER_TYPE } from '../utils/constants';
+import { createUser } from '../store/thunks/user';
 
 const SignUp = () => {
   const [css] = useStyletron();
   const [userType, setUserType] = useState(USER_TYPE.customer)
-  const history = useHistory();
+  const dispatch = useDispatch();
   const { handleSubmit, control } = useForm();
-  const onSubmit = async data => {
-    const res = await CredApi.signUp(data);
 
-    if (res.credId) {
-      localStorage.setItem(LOCAL_STORE_KEYS.user, JSON.stringify(res));
-      const nextPath = res.accountRole == USER_TYPE.customer ? '/customer' : '/restaurant';
-      history.push(nextPath);
-    }
+  const onSubmit = data => {
+    dispatch(createUser(data));
   };
 
   return (

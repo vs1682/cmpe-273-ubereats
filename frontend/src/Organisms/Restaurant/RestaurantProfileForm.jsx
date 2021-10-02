@@ -8,8 +8,10 @@ import { Button } from 'baseui/button';
 import { Textarea } from 'baseui/textarea';
 import { Cell, Grid } from 'baseui/layout-grid';
 
-import RestaurantApi from '../../api/restaurant';
 import Space from '../../Atoms/Space';
+import RestaurantApi from '../../api/restaurant';
+import { URLS } from '../../utils/constants';
+
 
 const RestaurantProfileForm = () => {
   const history = useHistory();
@@ -22,7 +24,7 @@ const RestaurantProfileForm = () => {
     });
 
     if (profile) {
-      history.push('/restaurant');
+      history.push(URLS.restaurant.base);
     }
   }
 

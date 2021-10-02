@@ -8,6 +8,7 @@ import {
 import { StyledLink } from "baseui/link";
 
 import BrandLogo from '../../Atoms/BrandLogo';
+import { URLS } from '../../utils/constants';
 
 const Layout = ({ children }) => {
   return (
@@ -23,18 +24,23 @@ const Layout = ({ children }) => {
         <NavigationList $align={ALIGN.center}></NavigationList>
         <NavigationList $align={ALIGN.right}>
           <NavigationItem>
-            <StyledLink href="/restaurant">
+            <StyledLink href={URLS.restaurant.base}>
               Profile
             </StyledLink>
           </NavigationItem>
           <NavigationItem>
-            <StyledLink href="/restaurant/dishes">
+          <StyledLink href={URLS.restaurant.dishes}>
               Dishes
             </StyledLink>
           </NavigationItem>
           <NavigationItem>
-            <StyledLink href="/restaurant/orders">
+          <StyledLink href={URLS.restaurant.orders}>
               Orders
+            </StyledLink>
+          </NavigationItem>
+          <NavigationItem>
+          <StyledLink href={URLS.login.signOut}>
+              Sign Out
             </StyledLink>
           </NavigationItem>
         </NavigationList>

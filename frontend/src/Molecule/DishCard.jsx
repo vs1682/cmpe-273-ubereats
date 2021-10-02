@@ -6,7 +6,7 @@ import Centered from '../Atoms/Centered';
 import Space from '../Atoms/Space';
 
 const DishCard = ({
-  imgUrl,
+  imageUrl,
   name,
   description,
   price
@@ -33,7 +33,7 @@ const DishCard = ({
         <div>{`$${price}`}</div>
       </Centered>
       <img
-        src={imgUrl}
+        src={imageUrl}
         className={css({ width: '158px', objectFit: 'cover' })}
         alt="Dish image"
       />

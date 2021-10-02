@@ -4,7 +4,7 @@ import { FileUploader } from "baseui/file-uploader";
 import {Button, KIND, SHAPE} from 'baseui/button';
 import Upload from 'baseui/icon/upload';
 
-const ImageUploader = () => {
+const ImageUploader = ({ onUpload }) => {
   const [css] = useStyletron();
   const [src, setSrc] = useState(null);
 
@@ -16,7 +16,8 @@ const ImageUploader = () => {
       <FileUploader
         // onCancel={stopFakeProgress}
         onDrop={(acceptedFiles) => {
-          setSrc(URL.createObjectURL(acceptedFiles[0]))
+          setSrc(URL.createObjectURL(acceptedFiles[0]));
+          onUpload(acceptedFiles[0]);
         }}
         overrides={{
           FileDragAndDrop: {

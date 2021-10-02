@@ -8,6 +8,7 @@ import { Drawer, ANCHOR } from 'baseui/drawer';
 import orderIcon from '../assets/order.svg';
 import favoriteIcon from '../assets/favorite.svg';
 import Space from '../Atoms/Space';
+import { URLS } from '../utils/constants';
 
 const MenuItem = styled('div', {
   display: 'flex',
@@ -32,7 +33,7 @@ const AccountMenuItem = ({ name }) => {
         <div>{name}</div>
         <Space size={0.5} />
         <div>
-          <StyledLink href="/customer" className={css({ color: 'green' })}>
+          <StyledLink href={URLS.customer.base} className={css({ color: 'green' })}>
             View Account
           </StyledLink>
         </div>
@@ -59,6 +60,11 @@ const DrawerMenu = ({ isOpen, onClose }) => {
         <img src={favoriteIcon} width="24px" height="24px" alt="favorite icon" />
         <Space horizontal size={2} />
         Favorite
+      </MenuItem>
+      <MenuItem>
+        <StyledLink href={URLS.login.signOut}>
+          Sign Out
+        </StyledLink>
       </MenuItem>
     </Drawer>
   )

@@ -23,7 +23,9 @@ const RestaurantProfile = () => {
       }
     }
 
-    getProfile();
+    if (localStorage.getItem('user')) {
+      getProfile();
+    }
   }, []);
 
   return (

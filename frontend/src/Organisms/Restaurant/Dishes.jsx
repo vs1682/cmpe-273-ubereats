@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 import { useStyletron } from 'baseui';
 import { Checkbox } from "baseui/checkbox";
 import { ButtonGroup } from "baseui/button-group";
@@ -11,13 +11,17 @@ import DishCard from '../../Molecule/DishCard';
 import DishFormModal from './DishForm';
 import editIcon from '../../assets/edit.svg';
 
+import DishApi from '../../api/dish';
+
 const Dishes = () => {
   const [css] = useStyletron();
   const [ allowDelete, setAllowDelete ] = useState(false);
   const [ showEditIconFor, setShowEditIconFor ] = useState(null);
-  const [ openDishModal, setOpenDishModal ] = useState(false);
-  const [ dishesDetails, setDishDetails ] = useState([]);
+  const [ openDishModalFor, setOpenDishModalFor ] = useState(null);
+  const [ dishesDetails, setDishDetails ] = useState({});
   const [ checkedDishes, setCheckedDishes ] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [modalOpenedFor, setModalOpenedFor] = useState(null);
 
   const onCheckDish = (e, id) => {
     if (e.target.checked) {
@@ -28,121 +32,61 @@ const Dishes = () => {
   }
 
   useEffect(() => {
-    // Make api call
-    setDishDetails([
-      {
-        category: 'Picked for you',
-        dishes: [
-          {
-            id: 1,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          },
-          {
-            id: 2,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          },
-          {
-            id: 3,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          },
-          {
-            id: 4,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          }
-        ]
-      },
-      {
-        category: 'Specials',
-        dishes: [
-          {
-            id: 5,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          },
-          {
-            id: 6,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          },
-          {
-            id: 7,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          },
-          {
-            id: 8,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          }
-        ]
-      },
-      {
-        category: 'Appetizers (Aperitivos)',
-        dishes: [
-          {
-            id: 9,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          },
-          {
-            id: 10,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          },
-          {
-            id: 11,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          },
-          {
-            id: 12,
-            name: 'Sandwich Cubano',
-            description: 'Our traditional roasted pork, ham, swiss cheese. Mustard and pickles grilled and pressed. Served with your choice of 1 white rice, sweet plantains, black beans, and garden salad with vinaigrette (2 pieces), yuca frita (2 pieces), tostones (2 pieces), gandules (2 pieces), or moros (2 pieces).',
-            price: '14',
-            imgUrl: 'https://d1ralsognjng37.cloudfront.net/471aa833-1a62-4fe3-88a0-2f507dcbcbb7.jpeg'
-          }
-        ]
+    const getCategories = async () => {
+      const data = await DishApi.getCategories();
+  
+      if (data && data.length > 0) {
+        setCategories(data);
       }
-    ])
-  }, []);
+    }
+
+    getCategories();
+  }, [])
+
+  useEffect(() => {
+    // Make api call
+    const getAllDishes = async () => {
+      const { credId } = JSON.parse(localStorage.getItem('user'));
+      const data = await DishApi.getAll(credId);
+  
+      if (data && data.length > 0) {
+        setDishDetails(_.groupBy(data, d => d.category));
+      }
+    }
+
+    if (categories.length) {
+      getAllDishes();    
+    }
+  }, [categories.length]);
+
+  const categoryMap = _.keyBy(categories, 'id');
 
   return (
     <div>
       <Centered className={css({ justifyContent: 'flex-end', padding: '16px' })}>
-        <ButtonGroup>
+        <ButtonGroup
+          selected={modalOpenedFor}
+          onClick={(e, idx) => {
+            if (modalOpenedFor === idx) {
+              setModalOpenedFor(null);
+            } else {
+              setModalOpenedFor(idx);
+            }
+
+            if (idx === 1) {
+              setAllowDelete(!allowDelete);
+            } else {
+              setOpenDishModalFor('NEW');
+            }
+          }}
+        >
           <Button>Add</Button>
-          <Button>Delete</Button>
+          <Button>{!allowDelete ? 'Delete' : 'Delete Selected'}</Button>
         </ButtonGroup>
       </Centered>
-      {dishesDetails.map(({ category, dishes }) => (
+      {_.entries(dishesDetails).map(([category, dishes]) => (
         <Centered direction="column">
-          <h2>{category}</h2>
+          <h2>{categoryMap[category].name}</h2>
           <Space />
           <Centered height="auto" className={css({ flexWrap: 'wrap' })}>
             {dishes.map(d => (
@@ -168,8 +112,8 @@ const Dishes = () => {
                         onChange={e => onCheckDish(e, d.id)}
                       />
                     )}
-                    {d.id === showEditIconFor && (
-                      <div onClick={() => setOpenDishModal(true)}>
+                    {!allowDelete && d.id === showEditIconFor && (
+                      <div onClick={() => setOpenDishModalFor(d.id)}>
                         <img src={editIcon} width={24} height={24} />
                       </div>
                     )}
@@ -177,10 +121,14 @@ const Dishes = () => {
               </div>
             ))}
           </Centered>
-          <DishFormModal
-            isOpen={openDishModal}
-            onClose={() => setOpenDishModal(false)}
-          />
+          {openDishModalFor && (
+            <DishFormModal
+              dishId={openDishModalFor}
+              isOpen={!!openDishModalFor}
+              onClose={() => setOpenDishModalFor(null)}
+              onSubmitForm={() => {}}
+            />
+          )}
         </Centered>
       ))}
     </div>

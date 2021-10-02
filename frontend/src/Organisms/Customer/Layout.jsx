@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Drawer, ANCHOR } from 'baseui/drawer';
 import { Button } from 'baseui/button';
 import {
   HeaderNavigation,
@@ -48,7 +47,6 @@ const Layout = ({ children }) => {
       <DrawerMenu
         onClose={() => setDrawerOpen(false)}
         isOpen={isDrawerOpen}
-        anchor={ANCHOR.left}
       />
       {children}
     </>
