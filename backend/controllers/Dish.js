@@ -1,7 +1,5 @@
 import DishService from '../services/Dish.js';
-import Customer from '../services/Customer.js';
-import Restaurant from '../services/Restaurant.js';
-import { USER_TYPE } from '../utils/constants.js';
+import ImageService from '../services/Image.js';
 
 const DishController = {};
 
@@ -10,15 +8,21 @@ DishController.create = async (req, res) => {
     res.status(400).send({
       message: "Required fields not present"
     });
+    return;
   }
 
-  const [err, data] = await DishService.create(req.body);
+  let imgErr, imgData;
+  if (req.body.imageUrl) {
+    [imgErr, imgData] = await ImageService.create({ url: req.body.imageUrl });
+  }
+  const [err, data] = await DishService.create({ ...req.body, imageId: imgData ? imgData.id : null });
 
-  if (err) {
+  if (imgErr || err) {
     res.status(500).send({
       message:
         err.message || "Some error occurred while creating the Dish."
     });
+    return;
   }
 
   res.json(data);
@@ -31,7 +35,13 @@ DishController.update = async (req, res) => {
     });
   }
 
-  const [err, data] = await DishService.update(req.body);
+  let imgErr, imgData;
+  if (!req.body.imageId && req.body.imageUrl) {
+    [imgErr, imgData] = await ImageService.create({ url: req.body.imageUrl });
+  }
+  const [err, data] = await DishService.update({
+    ...req.body,
+    imageId: req.body.imageId ? req.body.imageId : (imgData && imgData.id) || null   });
   
   if (err) {
     res.status(500).send({

@@ -5,6 +5,7 @@ import authenticateTokenMiddleware from './middlewares/authentication.js';
 import credsRoutes from './routes/creds.js';
 import restaurantRoutes from './routes/restaurant.js';
 import dishRoutes from './routes/dish.js';
+import uploadRoutes from './routes/upload.js';
 
 const app = express();
 
@@ -16,11 +17,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   if (req.method === 'POST') {
-    console.log('---REQUEST---', req.body);
+    console.log('---REQUEST BODY---', req.body);
   } else {
     console.log('---REQUEST QUERY---', req.query);
     console.log('---REQUEST PARAM---', req.params);
   }
+  // console.log('---REQUEST PARAM---', req.file, req.files);
 
   next();
 });
@@ -30,6 +32,8 @@ app.use('/api/creds', credsRoutes);
 app.use('/api/restaurant', restaurantRoutes);
 
 app.use('/api/dish', dishRoutes);
+
+app.use('/api/upload', uploadRoutes);
 
 // set port, listen for requests
 app.listen(8000, () => {

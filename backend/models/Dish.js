@@ -20,7 +20,7 @@ Dish.create = (dish) => {
         return;
       }
   
-      resolve([null, { id: result.insertId, ...dish }]);
+      resolve([null, { ...dish, id: result.insertId }]);
     });
   });
 }
@@ -45,7 +45,7 @@ Dish.update = (dish) => {
 Dish.find = (restId, id) => {
   return new Promise(resolve => {
     db.query(
-      'select * from dish where id=? and restId=?',
+      'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id where d.id=? and d.restId=?',
       [id, restId],
       (err, result) => {
         if (err) {
@@ -62,7 +62,7 @@ Dish.find = (restId, id) => {
 Dish.findAll = (restId) => {
   return new Promise(resolve => {
     db.query(
-      'select * from dish where restId=?',
+      'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id where restId=?',
       restId,
       (err, result) => {
         if (err) {
