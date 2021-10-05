@@ -68,6 +68,12 @@ DishService.update = (data) => {
   return Dish.update(dish);
 }
 
+DishService.deleteMultiple = (query) => {
+  const { restId, ids } = query;
+
+  return Dish.deleteMultiple(restId, ids);
+}
+
 DishService.getCategories = () => {
   return Dish.getCategories();
 }

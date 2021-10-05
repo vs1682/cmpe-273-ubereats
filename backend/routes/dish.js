@@ -16,5 +16,7 @@ router.get('/:restId', DishController.findAll);
 
 router.put('/:id', DishController.update);
 
+router.delete('/', DishController.deleteMultiple);
+
 export default router;
 

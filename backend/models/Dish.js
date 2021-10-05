@@ -63,7 +63,7 @@ Dish.findAll = (restId) => {
   return new Promise(resolve => {
     db.query(
       'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id where restId=?',
-      restId,
+      [restId],
       (err, result) => {
         if (err) {
           resolve([err, null]);
@@ -71,6 +71,40 @@ Dish.findAll = (restId) => {
         }
     
         resolve([null, result]);
+      }
+    );
+  });
+}
+
+Dish.delete = (restId, ids) => {
+  return new Promise(resolve => {
+    db.query(
+      'delete from dish where restId=? and id=?',
+      [restId, ids],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result[0]]);
+      }
+    );
+  });
+}
+
+Dish.deleteMultiple = (restId, ids) => {
+  return new Promise(resolve => {
+    db.query(
+      'delete from dish where restId=? and id in (?)',
+      [restId, ids],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result[0]]);
       }
     );
   });

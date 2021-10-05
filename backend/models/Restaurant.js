@@ -8,6 +8,7 @@ const Restaurant = function(restaurant) {
   this.phone = restaurant.phone;
   this.timing = restaurant.timing;
   this.deliveryModeAllowed = restaurant.deliveryModeAllowed;
+  this.profilePicUrl = restaurant.profilePicUrl;
 };
 
 Restaurant.create = (restaurant) => {

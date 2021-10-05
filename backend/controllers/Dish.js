@@ -91,6 +91,47 @@ DishController.findAll = async (req, res) => {
   res.json(data);
 }
 
+DishController.delete = async (req, res) => {
+  if (!req.query) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const [err, data] = await DishService.deleteMultiple(req.query);
+  
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while fetching dish."
+    });
+  }
+
+  res.json(data);
+}
+
+DishController.deleteMultiple = async (req, res) => {
+  if (!req.query) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const [err, data] = await DishService.deleteMultiple({
+    ...req.query,
+    ids: JSON.parse(req.query.ids)
+  });
+  
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while fetching dish."
+    });
+  }
+
+  res.json(data);
+}
+
 DishController.getCategories = async (req, res) => {
   const [err, data] = await DishService.getCategories();
   
