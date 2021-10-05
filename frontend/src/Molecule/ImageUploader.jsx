@@ -4,7 +4,7 @@ import { FileUploader } from "baseui/file-uploader";
 import {Button, KIND, SHAPE} from 'baseui/button';
 import Upload from 'baseui/icon/upload';
 
-const ImageUploader = ({ onUpload }) => {
+const ImageUploader = ({ imageSrc, onUpload }) => {
   const [css] = useStyletron();
   const [src, setSrc] = useState(null);
 
@@ -29,9 +29,9 @@ const ImageUploader = ({ onUpload }) => {
             })
           },
           ContentMessage: {
-            component: () => src && (
+            component: () => (src || imageSrc) && (
               <img
-                src={src}
+                src={src || imageSrc}
                 className={css({
                   width: '200px',
                   height: 'auto',

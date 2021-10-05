@@ -6,7 +6,6 @@ import { Input } from "baseui/input";
 import { Button } from 'baseui/button';
 import { Textarea } from 'baseui/textarea';
 import { Cell, Grid } from 'baseui/layout-grid';
-import { FileUploader } from "baseui/file-uploader";
 import {
   Modal,
   ModalHeader,
@@ -18,6 +17,7 @@ import {
 import Space from '../../Atoms/Space';
 import DishApi from '../../api/dish';
 import ImageUploader from '../../Molecule/ImageUploader';
+import UploadApi from '../../api/upload';
 
 const DishForm = ({
   dishId,
@@ -25,32 +25,35 @@ const DishForm = ({
   onClose,
   onSubmitForm
 }) => {
-  const { handleSubmit, control } = useForm();
+  const { handleSubmit, reset, control } = useForm();
   const [categories, setCategories] = useState([]);
   const [types, setTypes] = useState([]);
-  const [dish, setDish] = useState({});
-  const [imageData, setImageData] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
   const onSubmit = async (data) => {
     const { credId } = JSON.parse(localStorage.getItem('user'));
-    const formData = {
+
+    const reqData = {
       ...data,
+      ingredients: data.ingredients,
       restId: credId,
-      category: data.category.option.id,
-      type: data.type.option.id
+      category: data.category.value[0].id,
+      type: data.type.value[0].id,
+      imageUrl
     };
-    const fd = new FormData();
 
-    for (const key in formData) {
-      fd.append(key, formData[key]);
+    if (dishId && dishId != 'NEW') {
+      await DishApi.update({...reqData, id: dishId});
+    } else {
+      await DishApi.create(reqData);
     }
-
-    fd.append('image', imageData);
-
-    console.log('----formdata----', fd);
-
-    await DishApi.create(fd);
     // onClose();
-    // onSubmitForm();
+    onSubmitForm();
+  }
+
+  const onUploadImage = async (file) => {
+    const url = await UploadApi.getUploadUrl();
+    const res = await UploadApi.uploadImage(url.signedUrl, file);
+    setImageUrl(url.signedUrl.split('?')[0]);
   }
 
   useEffect(() => {
@@ -83,7 +86,17 @@ const DishForm = ({
       const data = await DishApi.getDish(credId, dishId);
   
       if (data) {
-        setDish(data);
+        const categoryMap = _.keyBy(categories, 'id');
+        const typeMap = _.keyBy(types, 'id');
+        setImageUrl(data.imageUrl);
+        reset({
+          name: data.name,
+          ingredients: data.ingredients,
+          description: data.description,
+          price: data.price,
+          category: {value: [{ id: data.category, label: categoryMap[data.category] }]},
+          type: {value: [{ id: data.type, label: typeMap[data.type]}]}
+        });
       }
     }
 
@@ -91,9 +104,6 @@ const DishForm = ({
       getDish();
     }
   }, [])
-
-  const categoryMap = _.keyBy(categories, 'id');
-  const typeMap = _.keyBy(types, 'id');
 
   return (
     <Modal
@@ -129,7 +139,6 @@ const DishForm = ({
                       <Input
                         placeholder="Dish Name"
                         {...field}
-                        value={field.value != undefined ? field.value : dish.name}
                       />
                     )}
                   />
@@ -145,7 +154,6 @@ const DishForm = ({
                       <Textarea
                         placeholder="Ingredients"
                         {...field}
-                        value={field.value != undefined ? field.value : dish.ingredients}
                       />
                     )}
                   />
@@ -161,7 +169,6 @@ const DishForm = ({
                       <Textarea
                         placeholder="Restaurant Description"
                         {...field}
-                        value={field.value != undefined ? field.value : dish.description}
                       />
                     )}
                   />
@@ -177,7 +184,6 @@ const DishForm = ({
                       <Input
                         placeholder="Price"
                         {...field}
-                        value={field.value != undefined ? field.value : dish.price}
                       />
                     )}
                   />
@@ -192,14 +198,10 @@ const DishForm = ({
                       rules={{ required: true }}
                       render={({ field }) => (
                         <Select
-                          {...field}
                           options={categories.map(c => ({ id: c.id, label: c.name }))}
                           placeholder="Select Category"
-                          value={
-                            field.value != undefined
-                              ? field.value.value :
-                              [{ id: dish.category, label: categoryMap[dish.category] }]
-                          }
+                          {...field}
+                          value={field.value != undefined ? field.value.value : []}
                         />
                       )}
                     />
@@ -213,14 +215,10 @@ const DishForm = ({
                     control={control}
                     render={({ field }) => (
                       <Select
-                        {...field}
                         options={types.map(t => ({ id: t.id, label: t.name }))}
                         placeholder="Select Type"
-                        value={
-                          field.value != undefined
-                            ? field.value.value :
-                            [{ id: dish.type, label: typeMap[dish.type]}]
-                        }
+                        {...field}
+                        value={field.value != undefined ? field.value.value : []}
                       />
                     )}
                   />
@@ -229,12 +227,12 @@ const DishForm = ({
               <Space />
               <Grid>
             <Cell span={12}>
-              <Button>Save Details</Button>
+              <Button type="submit">Save Details</Button>
             </Cell>
           </Grid>
             </Cell>
             <Cell span={3}>
-              <ImageUploader onUpload={data => setImageData(data)}/>
+              <ImageUploader imageSrc={imageUrl} onUpload={onUploadImage}/>
             </Cell>
           </Grid>
         </form>

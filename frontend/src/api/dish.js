@@ -50,9 +50,21 @@ DishApi.create = async (data) => {
   const response = await fetch(`${API_URL}/api/dish/create`, {
     method: 'post',
     headers: {
-      'Content-Type': 'multipart/form-data; boundary="form-boundary"'
+      'Content-Type': 'application/json'
     },
-    body: data
+    body: JSON.stringify(data)
+  });
+
+  return response.json();
+}
+
+DishApi.update = async (data) => {
+  const response = await fetch(`${API_URL}/api/dish/${data.id}`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
   });
 
   return response.json();

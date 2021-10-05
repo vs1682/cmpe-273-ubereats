@@ -32,11 +32,13 @@ const DishCard = ({
         </div>
         <div>{`$${price}`}</div>
       </Centered>
-      <img
-        src={imageUrl}
-        className={css({ width: '158px', objectFit: 'cover' })}
-        alt="Dish image"
-      />
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          className={css({ width: '158px', objectFit: 'cover' })}
+          alt="Dish image"
+        />
+      )}
     </Centered>
   );
 }
