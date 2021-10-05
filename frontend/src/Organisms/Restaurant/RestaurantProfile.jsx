@@ -1,31 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {Grid, Cell} from 'baseui/layout-grid';
 import { useStyletron } from 'baseui';
 import { Button } from "baseui/button";
 import { Spinner } from "baseui/spinner";
 import { Link,useRouteMatch } from 'react-router-dom';
 
-import RestaurantApi from '../../api/restaurant';
+import { fetchRestaurant } from '../../store/thunks/restaurant';
+
 import Centered from '../../Atoms/Centered';
 
 const RestaurantProfile = () => {
-  const [ profile, setProfile ] = useState({});
   const [css] = useStyletron();
   const { url } = useRouteMatch();
+  const dispatch = useDispatch();
+  const user = useSelector(state => state.user);
+  const profile = useSelector(state => state.restaurant || {});
 
   useEffect(() => {
-    const getProfile = async () => {
-      const restaurant = JSON.parse(localStorage.getItem('user'));
-      const profile = await RestaurantApi.getProfile(restaurant.credId);
-  
-      if (profile.credId) {
-        setProfile(profile);
-      }
-    }
-
-    if (localStorage.getItem('user')) {
-      getProfile();
-    }
+    dispatch(fetchRestaurant(user.credId));
   }, []);
 
   return (
@@ -38,14 +31,14 @@ const RestaurantProfile = () => {
       {profile && (
         <>
           <Grid>
-            <img
+            {profile.profilePicUrl && (<img
               className={css({
                 width: '100%',
                 height: '240px',
                 objectFit: 'cover'
               })}
-              src="https://cn-geo1.uber.com/image-proc/resize/eats/format=webp/width=550/height=440/quality=70/srcb64=aHR0cHM6Ly9kMXJhbHNvZ25qbmczNy5jbG91ZGZyb250Lm5ldC81YzkyNmU0Mi03NDE3LTRlYWQtOGM3OC04MDZjYTQzMTg2ZWM="
-            />
+              src={profile.profilePicUrl}
+            />)}
           </Grid>
           <Centered
             direction="column"

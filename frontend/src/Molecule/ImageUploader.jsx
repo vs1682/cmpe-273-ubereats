@@ -29,7 +29,7 @@ const ImageUploader = ({ imageSrc, onUpload }) => {
             })
           },
           ContentMessage: {
-            component: () => (src || imageSrc) && (
+            component: () => (src || imageSrc) ? (
               <img
                 src={src || imageSrc}
                 className={css({
@@ -38,7 +38,7 @@ const ImageUploader = ({ imageSrc, onUpload }) => {
                   objectFit: 'contain'
                 })}
               />
-            )
+            ) : null
           },
           ButtonComponent: {
             component: props => (
