@@ -23,34 +23,10 @@ CustomerService.find = (query) => {
   return Customer.find(customer);
 }
 
-CustomerService.update = (query) => {
-  const {
-    credId,
-    fullname,
-    dob,
-    city,
-    state,
-    country,
-    nickname,
-    phone,
-    profilePicUrl,
-    about
-  } = query;
+CustomerService.update = (data) => {
+  const customer = new Customer(data);
 
-  const customer = new Customer({
-    credId,
-    fullname,
-    dob,
-    city,
-    state,
-    country,
-    nickname,
-    phone,
-    profilePicUrl,
-    about
-  });
-
-  return Customer.find(customer);
+  return Customer.update(customer);
 }
 
 export default CustomerService;

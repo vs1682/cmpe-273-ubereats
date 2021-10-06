@@ -1,11 +1,13 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 
-import authenticateTokenMiddleware from './middlewares/authentication.js';
+// import authenticateTokenMiddleware from './middlewares/authentication.js';
 import credsRoutes from './routes/creds.js';
 import restaurantRoutes from './routes/restaurant.js';
 import dishRoutes from './routes/dish.js';
 import uploadRoutes from './routes/upload.js';
+import locationRoutes from './routes/location.js';
+import customerRoutes from './routes/customer.js';
 
 const app = express();
 
@@ -31,9 +33,13 @@ app.use('/api/creds', credsRoutes);
 
 app.use('/api/restaurant', restaurantRoutes);
 
+app.use('/api/customer', customerRoutes);
+
 app.use('/api/dish', dishRoutes);
 
 app.use('/api/upload', uploadRoutes);
+
+app.use('/api/countries', locationRoutes);
 
 // set port, listen for requests
 app.listen(8000, () => {

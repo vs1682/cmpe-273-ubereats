@@ -29,7 +29,7 @@ Customer.create = (customer) => {
 Customer.find = (customer) => {
   return new Promise(resolve => {
     db.query(
-      'select * from custProfile where credId=?',
+      'select cp.*, c.email from custProfile cp join creds c on cp.credId = c.id where cp.credId=?',
       [customer.credId],
       (err, result) => {
         if (err) {
@@ -48,13 +48,13 @@ Customer.update = (customer) => {
     db.query(
       'update custProfile SET ? where credId=?',
       [customer, customer.credId],
-      (err, result) => {
+      (err) => {
         if (err) {
           resolve([err, null]);
           return;
         }
     
-        resolve([null, result[0]]);
+        resolve([null, customer]);
       }
     );
   });

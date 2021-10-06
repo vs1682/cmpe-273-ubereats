@@ -1,53 +1,45 @@
-import Customer from '../models/Customer.js';
+import CustomerService from '../services/Customer.js';
 
 const CustomerController = {};
 
-CustomerController.create = (req, res) => {
+CustomerController.update = async (req, res) => {
   if (!req.body) {
     res.status(400).send({
       message: "Required fields not present"
     });
   }
 
-  const { credId, fullname } = req.body;
+  const { id } = req.params;
 
-  const customer = new Customer({
-    credId,
-    fullname
-  });
+  const [err, data] = await CustomerService.update({ credId: id, ...req.body });
 
-  Customer.create(customer, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Customer."
-      });
-    else res.send(data);
-  });
+  if (err) {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while updating the Customer."
+    });
+  }
+
+  res.json(data);
 }
 
-CustomerController.getProfile = (req, res) => {
-  if (!req.body) {
+CustomerController.getProfile = async (req, res) => {
+  if (!req.params) {
     res.status(400).send({
       message: "Required fields not present"
     });
   }
 
-  const { credId, fullname } = req.body;
+  const [err, data] = await CustomerService.find({ credId: req.params.id });
 
-  const customer = new Customer({
-    credId,
-    fullname
-  });
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while fetching profile."
+    });
+  }
 
-  Customer.create(customer, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Customer."
-      });
-    else res.send(data);
-  });
+  res.json(data);
 }
 
 export default CustomerController;
