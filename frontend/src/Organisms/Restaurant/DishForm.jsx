@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import _, { isNumber } from 'lodash';
 import { useForm, Controller } from 'react-hook-form';
 import { Select } from "baseui/select";
@@ -15,9 +16,9 @@ import {
 } from 'baseui/modal';
 
 import Space from '../../Atoms/Space';
-import DishApi from '../../api/dish';
 import ImageUploader from '../../Molecule/ImageUploader';
 import UploadApi from '../../api/upload';
+import { fetchDish, createDish, updateDish } from '../../store/thunks/dish';
 
 const DishForm = ({
   dishId,
@@ -25,28 +26,30 @@ const DishForm = ({
   onClose,
   onSubmitForm
 }) => {
+  const dispatch = useDispatch();
   const { handleSubmit, reset, control } = useForm();
-  const [categories, setCategories] = useState([]);
-  const [types, setTypes] = useState([]);
   const [imageUrl, setImageUrl] = useState(null);
-  const onSubmit = async (data) => {
-    const { credId } = JSON.parse(localStorage.getItem('user'));
+  const restaurant = useSelector(state => state.restaurant);
+  const categories = useSelector(state => state.dish.categories);
+  const types = useSelector(state => state.dish.types);
+  const dish = useSelector(state => state.dish.selected);
 
+  const onSubmit = async (data) => {
     const reqData = {
       ...data,
       ingredients: data.ingredients,
-      restId: credId,
+      restId: restaurant.credId,
       category: data.category.value[0].id,
       type: data.type.value[0].id,
       imageUrl
     };
 
     if (dishId && dishId != 'NEW') {
-      await DishApi.update({...reqData, id: dishId});
+      dispatch(updateDish({...reqData, id: dishId}));
     } else {
-      await DishApi.create(reqData);
+      dispatch(createDish(reqData));
     }
-    // onClose();
+    onClose();
     onSubmitForm();
   }
 
@@ -57,53 +60,28 @@ const DishForm = ({
   }
 
   useEffect(() => {
-    const getCategories = async () => {
-      const data = await DishApi.getCategories();
-  
-      if (data && data.length > 0) {
-        setCategories(data);
-      }
-    }
-
-    getCategories();
-  }, [])
-
-  useEffect(() => {
-    const getTypes = async () => {
-      const data = await DishApi.getTypes();
-  
-      if (data && data.length > 0) {
-        setTypes(data);
-      }
-    }
-
-    getTypes();
-  }, [])
-
-  useEffect(() => {
-    const getDish = async () => {
-      const { credId } = JSON.parse(localStorage.getItem('user'));
-      const data = await DishApi.getDish(credId, dishId);
-  
-      if (data) {
-        const categoryMap = _.keyBy(categories, 'id');
-        const typeMap = _.keyBy(types, 'id');
-        setImageUrl(data.imageUrl);
-        reset({
-          name: data.name,
-          ingredients: data.ingredients,
-          description: data.description,
-          price: data.price,
-          category: {value: [{ id: data.category, label: categoryMap[data.category] }]},
-          type: {value: [{ id: data.type, label: typeMap[data.type]}]}
-        });
-      }
-    }
-
     if (isNumber(dishId)) {
-      getDish();
+      dispatch(fetchDish({ restId: restaurant.credId, dishId }));
     }
-  }, [])
+  }, [dishId]);
+
+  useEffect(() => {
+    if (dish) {
+      const categoryMap = _.keyBy(categories, 'id');
+      const typeMap = _.keyBy(types, 'id');
+
+      setImageUrl(dish.imageUrl);
+      
+      reset({
+        name: dish.name,
+        ingredients: dish.ingredients,
+        description: dish.description,
+        price: dish.price,
+        category: {value: [{ id: dish.category, label: categoryMap[dish.category] }]},
+        type: {value: [{ id: dish.type, label: typeMap[dish.type]}]}
+      });
+    }
+  }, [dish])
 
   return (
     <Modal

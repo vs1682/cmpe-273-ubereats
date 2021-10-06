@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import UploadApi from '../api/upload';
 
@@ -14,4 +14,4 @@ const useUploadImage = (prevUrl) => {
   return [imageUrl, onUploadImage];
 }
 
-export default useUploadImage
+export default useUploadImage;

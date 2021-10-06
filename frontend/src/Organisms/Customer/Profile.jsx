@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import _ from 'lodash';
 import {Grid, Cell} from 'baseui/layout-grid';
 import { useStyletron } from 'baseui';
 import { Button } from "baseui/button";
@@ -6,10 +8,30 @@ import { Avatar } from "baseui/avatar";
 import { Link,useRouteMatch } from 'react-router-dom';
 
 import Centered from '../../Atoms/Centered';
+import { fetchCustomerProfile } from '../../store/thunks/customer';
+import { fetchDetails } from '../../store/thunks/countries';
 
 const Profile = () => {
+  const dispatch = useDispatch();
   const [css] = useStyletron();
   const { url } = useRouteMatch();
+  const user = useSelector(state => state.user);
+  const profile = useSelector(state => state.customer.profile || {});
+  const countryDetails = useSelector(state => state.countries.details || {});
+
+  useEffect(() => {
+    dispatch(fetchCustomerProfile(user.credId));
+  }, []);
+
+  useEffect(() => {
+    if (profile && profile.credId) {
+      dispatch(fetchDetails({
+        country: profile.country,
+        state: profile.state,
+        city: profile.city
+      }));
+    }
+  }, [profile]);
 
   return (
     <Centered
@@ -37,7 +59,7 @@ const Profile = () => {
             <Avatar
               name="Vishal Shinde"
               size="scale1600"
-              src="https://source.boringavatars.com/marble/120/Maria%20Mitchell?colors=264653,2a9d8f,e9c46a,f4a261,e76f51"
+              src={profile.profilePicUrl}
             />
           </Cell>
         </Grid>
@@ -46,7 +68,7 @@ const Profile = () => {
             <h3>Name</h3>
           </Cell>
           <Cell span={9}>
-            <p>Vishal Shinde</p>
+            <p>{profile.fullname}</p>
           </Cell>
         </Grid>
         <Grid>
@@ -54,7 +76,7 @@ const Profile = () => {
             <h3>DoB</h3>
           </Cell>
           <Cell span={9}>
-            <p>08/16/1992</p>
+            <p>{profile.dob}</p>
           </Cell>
         </Grid>
         <Grid>
@@ -62,7 +84,7 @@ const Profile = () => {
             <h3>City</h3>
           </Cell>
           <Cell span={9}>
-            <p>San Jose</p>
+            <p>{_.get(countryDetails, 'city.name')}</p>
           </Cell>
         </Grid>
         <Grid>
@@ -70,7 +92,7 @@ const Profile = () => {
             <h3>State</h3>
           </Cell>
           <Cell span={9}>
-            <p>California</p>
+            <p>{_.get(countryDetails, 'state.name')}</p>
           </Cell>
         </Grid>
         <Grid>
@@ -78,7 +100,7 @@ const Profile = () => {
             <h3>Country</h3>
           </Cell>
           <Cell span={9}>
-            <p>USA</p>
+            <p>{_.get(countryDetails, 'country.name')}</p>
           </Cell>
         </Grid>
         <Grid>
@@ -86,7 +108,7 @@ const Profile = () => {
             <h3>Email</h3>
           </Cell>
           <Cell span={9}>
-            <p></p>
+            <p>{profile.email}</p>
           </Cell>
         </Grid>
         <Grid>
@@ -94,7 +116,7 @@ const Profile = () => {
             <h3>Phone number</h3>
           </Cell>
           <Cell span={9}>
-            <p>+16316339059</p>
+            <p>{profile.phone}</p>
           </Cell>
         </Grid>
       </div>

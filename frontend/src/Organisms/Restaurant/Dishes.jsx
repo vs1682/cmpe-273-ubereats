@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
 import { useStyletron } from 'baseui';
 import { Checkbox } from "baseui/checkbox";
@@ -11,16 +12,23 @@ import DishCard from '../../Molecule/DishCard';
 import DishFormModal from './DishForm';
 import editIcon from '../../assets/edit.svg';
 
-import DishApi from '../../api/dish';
+import {
+  deleteDishes,
+  fetchAllDishes,
+  fetchDishCategories,
+  fetchDishTypes
+} from '../../store/thunks/dish';
 
 const Dishes = () => {
   const [css] = useStyletron();
+  const dispatch = useDispatch();
+  const restaurant = useSelector(state => state.restaurant);
+  const dishes = useSelector(state => state.dish.all);
+  const categories = useSelector(state => state.dish.categories);
   const [ allowDelete, setAllowDelete ] = useState(false);
   const [ showEditIconFor, setShowEditIconFor ] = useState(null);
   const [ openDishModalFor, setOpenDishModalFor ] = useState(null);
-  const [ dishesDetails, setDishDetails ] = useState({});
   const [ checkedDishes, setCheckedDishes ] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [modalOpenedFor, setModalOpenedFor] = useState(null);
 
   const onCheckDish = (e, id) => {
@@ -31,35 +39,23 @@ const Dishes = () => {
     }
   }
 
-  useEffect(() => {
-    const getCategories = async () => {
-      const data = await DishApi.getCategories();
-  
-      if (data && data.length > 0) {
-        setCategories(data);
-      }
-    }
+  const onDeleteDishes = () => {
+    dispatch(deleteDishes({ restId: restaurant.credId, ids: checkedDishes }));
+  }
 
-    getCategories();
+  useEffect(() => {
+    dispatch(fetchDishCategories());
+    dispatch(fetchDishTypes());
   }, [])
 
   useEffect(() => {
-    // Make api call
-    const getAllDishes = async () => {
-      const { credId } = JSON.parse(localStorage.getItem('user'));
-      const data = await DishApi.getAll(credId);
-  
-      if (data && data.length > 0) {
-        setDishDetails(_.groupBy(data, d => d.category));
-      }
-    }
-
     if (categories.length) {
-      getAllDishes();    
+      dispatch(fetchAllDishes(restaurant.credId));
     }
   }, [categories.length]);
 
   const categoryMap = _.keyBy(categories, 'id');
+  const dishesDetails = _.groupBy(dishes, d => d.category);
 
   return (
     <div>
@@ -74,6 +70,10 @@ const Dishes = () => {
             }
 
             if (idx === 1) {
+              if (allowDelete) {
+                onDeleteDishes();
+              }
+
               setAllowDelete(!allowDelete);
             } else {
               setOpenDishModalFor('NEW');

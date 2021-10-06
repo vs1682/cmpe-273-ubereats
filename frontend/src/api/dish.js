@@ -70,4 +70,15 @@ DishApi.update = async (data) => {
   return response.json();
 }
 
+DishApi.deleteMultiple = async (restId, ids) => {
+  await fetch(`${API_URL}/api/dish?restId=${restId}&ids=${JSON.stringify(ids)}`, {
+    method: 'delete',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  return ids;
+}
+
 export default DishApi;
