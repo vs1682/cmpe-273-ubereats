@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useCart } from 'react-use-cart';
 import { Button } from 'baseui/button';
 import {
   HeaderNavigation,
@@ -14,6 +16,8 @@ import CartButton from '../../Molecule/CartButton';
 import DrawerMenu from '../../Molecule/DrawerMenu';
 
 const Layout = ({ children }) => {
+  const { totalItems  } = useCart();
+  const profile = useSelector(state => state.customer.profile);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   return (
     <>
@@ -40,11 +44,12 @@ const Layout = ({ children }) => {
             />
           </NavigationItem>
           <NavigationItem>
-            <CartButton />
+            <CartButton quantity={totalItems} />
           </NavigationItem>
         </NavigationList>
       </HeaderNavigation>
       <DrawerMenu
+        userName={profile.fullname}
         onClose={() => setDrawerOpen(false)}
         isOpen={isDrawerOpen}
       />

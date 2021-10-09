@@ -1,17 +1,21 @@
 import React from 'react';
-import LinesEllipsis from 'react-lines-ellipsis'
 import { useStyletron } from 'baseui';
+import LinesEllipsis from 'react-lines-ellipsis';
 
 import Centered from '../Atoms/Centered';
 import Space from '../Atoms/Space';
+import AdderRemover from '../Atoms/AdderRemover';
 
 const DishCard = ({
   imageUrl,
   name,
   description,
-  price
+  price,
+  quantity,
+  onAddItem,
+  onRemoveItem
 }) => {
-  const [css] = useStyletron();
+  const [css] = useStyletron();  
 
   return (
     <Centered
@@ -30,7 +34,23 @@ const DishCard = ({
             basedOn='letters'
           />
         </div>
-        <div>{`$${price}`}</div>
+        <div
+          className={css({
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginRight: '16px'
+          })}
+        >
+          <div>{`$${price}`}</div>
+          <div>
+            <AdderRemover
+              quantity={quantity}
+              onAdd={onAddItem}
+              onRemove={onRemoveItem}
+            />
+          </div>
+        </div>
       </Centered>
       {imageUrl && (
         <img

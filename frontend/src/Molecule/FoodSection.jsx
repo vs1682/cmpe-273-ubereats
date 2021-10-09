@@ -1,91 +1,43 @@
 import React from 'react';
 import { useStyletron } from 'baseui';
-import {
-  Display1,
-  Display2,
-  Display3,
-  Display4,
-} from 'baseui/typography';
+import { Display4 } from 'baseui/typography';
+import { Link } from 'react-router-dom';
 
 import RestaurantCard from './RestaurantCard';
+import { URLS } from '../utils/constants';
 
-const restaurants = [
-  {
-    id: 1,
-    imgUrl: 'https://d1ralsognjng37.cloudfront.net/5176bfe7-d608-4d6b-ad58-ba34d58bf573.jpeg',
-    name: 'Starbucks',
-    rating: 4.6,
-    deliveryFee: 2.49,
-    estDeliveryTime: '15-25m'
-  },
-  {
-    id: 2,
-    imgUrl: 'https://d1ralsognjng37.cloudfront.net/5176bfe7-d608-4d6b-ad58-ba34d58bf573.jpeg',
-    name: 'Starbucks',
-    rating: 4.6,
-    deliveryFee: 2.49,
-    estDeliveryTime: '15-25m'
-  },
-  {
-    id: 3,
-    imgUrl: 'https://d1ralsognjng37.cloudfront.net/5176bfe7-d608-4d6b-ad58-ba34d58bf573.jpeg',
-    name: 'Starbucks',
-    rating: 4.6,
-    deliveryFee: 2.49,
-    estDeliveryTime: '15-25m'
-  },
-  {
-    id: 4,
-    imgUrl: 'https://d1ralsognjng37.cloudfront.net/5176bfe7-d608-4d6b-ad58-ba34d58bf573.jpeg',
-    name: 'Starbucks',
-    rating: 4.6,
-    deliveryFee: 2.49,
-    estDeliveryTime: '15-25m'
-  },
-  {
-    id: 5,
-    imgUrl: 'https://d1ralsognjng37.cloudfront.net/5176bfe7-d608-4d6b-ad58-ba34d58bf573.jpeg',
-    name: 'Starbucks',
-    rating: 4.6,
-    deliveryFee: 2.49,
-    estDeliveryTime: '15-25m'
-  },
-  {
-    id: 6,
-    imgUrl: 'https://d1ralsognjng37.cloudfront.net/5176bfe7-d608-4d6b-ad58-ba34d58bf573.jpeg',
-    name: 'Starbucks',
-    rating: 4.6,
-    deliveryFee: 2.49,
-    estDeliveryTime: '15-25m'
-  },
-  {
-    id: 7,
-    imgUrl: 'https://d1ralsognjng37.cloudfront.net/5176bfe7-d608-4d6b-ad58-ba34d58bf573.jpeg',
-    name: 'Starbucks',
-    rating: 4.6,
-    deliveryFee: 2.49,
-    estDeliveryTime: '15-25m'
-  }
-];
-
-const FoodSection = ({ heading = 'Favorites', desc = 'Nearby restaurants delivered for less' }) => {
+const FoodSection = ({ heading, desc, restaurants = [] }) => {
   const [css] = useStyletron();
 
   return (
     <div>
-      <Display4 className={css({ marginBottom: '8px' })}>{heading}</Display4>
-      <span>{desc}</span>
+      {heading && (<Display4 className={css({ marginBottom: '8px' })}>{heading}</Display4>)}
+      {desc && (<span>{desc}</span>)}
       <div className={css({
         display: 'flex',
-        overflow: 'auto'
+        flexWrap: 'wrap',
+        margin: '0 16px'
       })}>
         {restaurants.map(r => (
-          <div key={r.id} className={css({
-            width: '200px',
-            padding: '16px 16px 16px 0'
-          })}>
-            <RestaurantCard {...r} />
-          </div>
+          <Link
+            className={css({
+              cursor: 'pointer',
+              textDecoration: 'none',
+              color: 'inherit'
+            })}
+            to={`${URLS.restaurant.base}/${r.credId}`}
+          >
+            <div key={r.id} className={css({
+              width: `${(window.innerWidth / restaurants.length)}px`,
+              minWidth: '160px',
+              padding: '16px 16px 16px 0',
+            })}>
+              <RestaurantCard
+                {...r}
+                estDeliveryTime="25-35m"
+              />
+            </div>
+          </Link>
         ))}
       </div>
     </div>

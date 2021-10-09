@@ -121,16 +121,16 @@ const Dishes = () => {
               </div>
             ))}
           </Centered>
-          {openDishModalFor && (
-            <DishFormModal
-              dishId={openDishModalFor}
-              isOpen={!!openDishModalFor}
-              onClose={() => setOpenDishModalFor(null)}
-              onSubmitForm={() => {}}
-            />
-          )}
         </Centered>
       ))}
+      {openDishModalFor && (
+        <DishFormModal
+          dishId={openDishModalFor}
+          isOpen={!!openDishModalFor}
+          onClose={() => setOpenDishModalFor(null)}
+          onSubmitForm={() => {}}
+        />
+      )}
     </div>
   )
 }

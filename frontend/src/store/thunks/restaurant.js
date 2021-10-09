@@ -10,6 +10,14 @@ const fetchRestaurant = createAsyncThunk(
   }
 );
 
+const fetchAllRestaurant = createAsyncThunk(
+  'restaurant/all/fetch',
+  async () => {
+    const response = await RestaurantApi.getAll();
+    return response;
+  }
+);
+
 const updateRestaurant = createAsyncThunk(
   'restaurant/update',
   async (data) => {
@@ -20,5 +28,6 @@ const updateRestaurant = createAsyncThunk(
 
 export {
   fetchRestaurant,
+  fetchAllRestaurant,
   updateRestaurant
 };

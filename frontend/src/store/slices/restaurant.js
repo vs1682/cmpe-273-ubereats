@@ -1,7 +1,30 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { fetchRestaurant } from '../thunks/restaurant';
+import { fetchRestaurant, fetchAllRestaurant } from '../thunks/restaurant';
 import { LOCAL_STORE_KEYS } from '../../utils/constants';
+
+const fetchRestaurantReducer = (state, action) => {
+  if (action.payload) {
+    return {
+      ...state,
+      ...action.payload,
+      selected: action.payload
+    };
+  }
+
+  return state;
+}
+
+const fetchAllRestaurantReducer = (state, action) => {
+  if (action.payload) {
+    return {
+      ...state,
+      all: action.payload
+    };
+  }
+
+  return state;
+}
 
 export const restaurantSlice = createSlice({
   name: 'restaurant',
@@ -10,16 +33,8 @@ export const restaurantSlice = createSlice({
     removeRestaurant: () => {}
   },
   extraReducers: {
-    [fetchRestaurant.fulfilled]: (state, action) => {
-      if (action.payload) {
-        return {
-          ...state,
-          ...action.payload
-        };
-      }
-
-      return state;
-    },
+    [fetchRestaurant.fulfilled]: fetchRestaurantReducer,
+    [fetchAllRestaurant.fulfilled]: fetchAllRestaurantReducer
   },
 })
 

@@ -42,7 +42,11 @@ const AccountMenuItem = ({ name }) => {
   );
 }
 
-const DrawerMenu = ({ isOpen, onClose }) => {
+const DrawerMenu = ({
+  isOpen,
+  onClose,
+  userName
+}) => {
   return (
     <Drawer
       isOpen={isOpen}
@@ -50,7 +54,7 @@ const DrawerMenu = ({ isOpen, onClose }) => {
       size="auto"
       anchor={ANCHOR.left}
     >
-      <AccountMenuItem name="Vishal Shinde" />
+      <AccountMenuItem name={userName} />
       <MenuItem>
         <img src={orderIcon} width="24px" height="24px" alt="order icon" />
         <Space horizontal size={2} />
