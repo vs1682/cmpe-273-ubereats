@@ -8,4 +8,6 @@ router.get('/profile/:id', RestaurantController.findById);
 
 router.put('/profile/:id', RestaurantController.update);
 
+router.get('/', RestaurantController.findAll);
+
 export default router;

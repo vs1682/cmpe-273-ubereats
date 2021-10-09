@@ -58,4 +58,21 @@ Restaurant.find = (restaurant) => {
   });
 }
 
+Restaurant.findAll = () => {
+  return new Promise(resolve => {
+    db.query(
+      'select * from restaurantProfile',
+      [],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result]);
+      }
+    );
+  });
+}
+
 export default Restaurant;

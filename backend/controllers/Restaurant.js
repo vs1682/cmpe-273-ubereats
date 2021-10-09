@@ -42,6 +42,19 @@ RestaurantController.findById = async (req, res) => {
   res.json(data);
 }
 
+RestaurantController.findAll = async (req, res) => {
+  const [err, data] = await RestaurantService.findAll();
+
+  if (err) {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while finding the Restaurant."
+    });
+  }
+
+  res.json(data);
+}
+
 RestaurantController.update = async (req, res) => {
   if (!req.body) {
     res.status(400).send({
