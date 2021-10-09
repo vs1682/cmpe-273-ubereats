@@ -14,11 +14,14 @@ import { Menu } from "baseui/icon";
 import BrandLogo from '../../Atoms/BrandLogo';
 import CartButton from '../../Molecule/CartButton';
 import DrawerMenu from '../../Molecule/DrawerMenu';
+import Cart from './Cart';
 
 const Layout = ({ children }) => {
   const { totalItems  } = useCart();
   const profile = useSelector(state => state.customer.profile);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [isCartOpen, setCartOpen] = useState(false);
+
   return (
     <>
       <HeaderNavigation>
@@ -44,7 +47,7 @@ const Layout = ({ children }) => {
             />
           </NavigationItem>
           <NavigationItem>
-            <CartButton quantity={totalItems} />
+            <CartButton quantity={totalItems} onClick={() => setCartOpen(true)} />
           </NavigationItem>
         </NavigationList>
       </HeaderNavigation>
@@ -52,6 +55,10 @@ const Layout = ({ children }) => {
         userName={profile.fullname}
         onClose={() => setDrawerOpen(false)}
         isOpen={isDrawerOpen}
+      />
+      <Cart
+        isOpen={isCartOpen}
+        onClose={() => setCartOpen(false)}
       />
       {children}
     </>

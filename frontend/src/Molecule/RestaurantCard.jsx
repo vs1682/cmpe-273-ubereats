@@ -15,16 +15,20 @@ const SpaceBetweenContainer = styled('div', {
 });
 
 const RestaurantCard = ({
+  isFavorite,
   profilePicUrl,
   name,
   rating,
   deliveryFee = 0,
-  estDeliveryTime
+  estDeliveryTime,
+  onAddFavorite
 }) => {
   const [css] = useStyletron();
   const [favIconHovered, setFavIconHovered] = useState(false);
 
-  const addToFavorites = () => {}
+  const favIconSrc = isFavorite || favIconHovered
+    ? favFilled
+    : favOutlined
 
   return (
     <Centered direction="column">
@@ -32,11 +36,14 @@ const RestaurantCard = ({
         <img src={profilePicUrl} width="100%" height="128px" alt="restaurant image" />
         <BlackShade>
           <img
-            src={favIconHovered ? favFilled : favOutlined }
+            src={favIconSrc}
             className={css({ position: 'absolute', right: '8px', top: '8px' })}
             onMouseEnter={() => setFavIconHovered(true)}
             onMouseLeave={() => setFavIconHovered(false)}
-            onClick={addToFavorites}
+            onClick={e => {
+              e.preventDefault();
+              onAddFavorite();
+            }}
           />
         </BlackShade>
       </div>

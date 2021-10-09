@@ -6,7 +6,12 @@ import { Link } from 'react-router-dom';
 import RestaurantCard from './RestaurantCard';
 import { URLS } from '../utils/constants';
 
-const FoodSection = ({ heading, desc, restaurants = [] }) => {
+const FoodSection = ({
+  heading,
+  desc,
+  restaurants = [],
+  onAddFavorite
+}) => {
   const [css] = useStyletron();
 
   return (
@@ -35,6 +40,7 @@ const FoodSection = ({ heading, desc, restaurants = [] }) => {
               <RestaurantCard
                 {...r}
                 estDeliveryTime="25-35m"
+                onAddFavorite={() => onAddFavorite(r.credId)}
               />
             </div>
           </Link>

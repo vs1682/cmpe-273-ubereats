@@ -25,8 +25,8 @@ RestaurantApi.updateProfile = async (data) => {
   return response.json();
 }
 
-RestaurantApi.getAll = async () => {
-  const response = await fetch(`${API_URL}/api/restaurant/`, {
+RestaurantApi.getAll = async (customerId) => {
+  const response = await fetch(`${API_URL}/api/restaurant?customerId=${customerId}`, {
     method: 'get',
     headers: {
       'Content-Type': 'application/json'

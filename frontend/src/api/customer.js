@@ -25,4 +25,16 @@ CustomerApi.updateProfile = async (data) => {
   return response.json();
 }
 
+CustomerApi.addFavorite = async (data) => {
+  const response = await fetch(`${API_URL}/api/customer/favorite`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  return response.json();
+}
+
 export default CustomerApi;

@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import RestaurantApi from '../../api/restaurant';
+import CustomerApi from '../../api/customer';
 
 const fetchRestaurant = createAsyncThunk(
   'restaurant/fetch',
@@ -12,8 +13,8 @@ const fetchRestaurant = createAsyncThunk(
 
 const fetchAllRestaurant = createAsyncThunk(
   'restaurant/all/fetch',
-  async () => {
-    const response = await RestaurantApi.getAll();
+  async (customerId) => {
+    const response = await RestaurantApi.getAll(customerId);
     return response;
   }
 );
@@ -26,7 +27,16 @@ const updateRestaurant = createAsyncThunk(
   }
 );
 
+const addFavorite = createAsyncThunk(
+  'restaurant/favorite/add',
+  async (data) => {
+    const response = await CustomerApi.addFavorite(data);
+    return response;
+  }
+);
+
 export {
+  addFavorite,
   fetchRestaurant,
   fetchAllRestaurant,
   updateRestaurant
