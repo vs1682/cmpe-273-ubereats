@@ -1,4 +1,5 @@
 import Restaurant from '../models/Restaurant.js';
+import Customer from '../models/Customer.js';
 
 const RestaurantService = {};
 
@@ -24,8 +25,29 @@ RestaurantService.find = (query) => {
   return Restaurant.find(restaurant);
 }
 
-RestaurantService.findAll = () => {
-  return Restaurant.findAll();
+RestaurantService.findAll = async (query) => {
+  const [err, restaurants] = await Restaurant.findAll();
+
+  let favErr, customerFavorites;
+  if (!err && query.customerId) {
+    [favErr, customerFavorites] = await Customer.findAllFavoritesById(query.customerId);
+
+    const customerFavoriteRestaurantIds = customerFavorites.map(f => f.restId);
+
+    if (!favErr && restaurants) {
+      restaurants.forEach(r => {
+        r.isFavorite = false;
+
+        if (customerFavoriteRestaurantIds.includes(r.credId)) {
+          r.isFavorite = true;
+        }
+      });
+
+      return [favErr, restaurants];
+    }
+  }
+  
+  return [err, restaurants];
 }
 
 RestaurantService.update = (query) => {

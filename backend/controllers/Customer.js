@@ -42,4 +42,23 @@ CustomerController.getProfile = async (req, res) => {
   res.json(data);
 }
 
+CustomerController.favorite = async (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const [err, data] = await CustomerService.favorite(req.body);
+
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while adding favorite."
+    });
+  }
+
+  res.json(data);
+}
+
 export default CustomerController;

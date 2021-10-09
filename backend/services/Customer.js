@@ -1,4 +1,4 @@
-import Customer from '../models/Customer.js';
+import Customer, { CustomerFavorite } from '../models/Customer.js';
 
 const CustomerService = {};
 
@@ -27,6 +27,17 @@ CustomerService.update = (data) => {
   const customer = new Customer(data);
 
   return Customer.update(customer);
+}
+
+CustomerService.favorite = (query) => {
+  const { custId, restId } = query;
+
+  const favorite = new CustomerFavorite({
+    custId,
+    restId
+  });
+
+  return Customer.favorite(favorite);
 }
 
 export default CustomerService;

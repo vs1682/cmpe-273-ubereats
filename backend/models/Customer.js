@@ -13,6 +13,11 @@ const Customer = function(customer) {
   this.about = customer.about;
 };
 
+const CustomerFavorite = function(favorite) {
+  this.custId = favorite.custId;
+  this.restId = favorite.restId;
+}
+
 Customer.create = (customer) => {
   return new Promise(resolve => {
     db.query("insert into custProfile SET ?", customer, (err, result) => {
@@ -59,5 +64,43 @@ Customer.update = (customer) => {
     );
   });
 }
+
+Customer.favorite = (customerFavorite) => {
+  return new Promise(resolve => {
+    db.query(
+      'insert into favorite SET ?',
+      [customerFavorite],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, { id: result.insertId, ...customerFavorite }]);
+      }
+    );
+  });
+}
+
+Customer.findAllFavoritesById = (custId) => {
+  return new Promise(resolve => {
+    db.query(
+      'select restId from favorite where custId = ?',
+      [custId],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result]);
+      }
+    );
+  });
+}
+
+export {
+  CustomerFavorite
+};
 
 export default Customer;
