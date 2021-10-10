@@ -1,4 +1,5 @@
-import Customer, { CustomerFavorite } from '../models/Customer.js';
+import Customer, { CustomerFavorite, CustomerAddress } from '../models/Customer.js';
+import Restaurant from '../models/Restaurant.js';
 
 const CustomerService = {};
 
@@ -38,6 +39,52 @@ CustomerService.favorite = (query) => {
   });
 
   return Customer.favorite(favorite);
+}
+
+CustomerService.findFavorites = async (query) => {
+  const { custId } = query;
+
+  const [err, result] = await Customer.findFavorites(custId);
+  
+  if (!err) {
+    const restIds = result.map(r => r.restId);
+
+    let [errRest, restaurants] = await Restaurant.findMultiple(restIds);
+
+    if (!errRest) {
+      restaurants = restaurants.map(r => {
+        r.isFavorite = true;
+        return r;
+      });
+    }
+
+    return [errRest, restaurants];
+  }
+
+  return [err, null];
+}
+
+CustomerService.addAddress = (query) => {
+  const { custId, address } = query;
+
+  const newAddress = new CustomerAddress({
+    custId,
+    address
+  });
+
+  return Customer.addAddress(newAddress);
+}
+
+CustomerService.findAddress = (query) => {
+  const { custId, addressId } = query;
+
+  return Customer.findAddress(custId, addressId);
+}
+
+CustomerService.findAllAddress = (query) => {
+  const { custId } = query;
+
+  return Customer.findAllAddress(custId);
 }
 
 export default CustomerService;

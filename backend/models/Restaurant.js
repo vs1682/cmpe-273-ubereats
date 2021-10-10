@@ -58,6 +58,23 @@ Restaurant.find = (restaurant) => {
   });
 }
 
+Restaurant.findMultiple = (restIds) => {
+  return new Promise(resolve => {
+    db.query(
+      'select * from restaurantProfile where credId in (?)',
+      [restIds],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result]);
+      }
+    );
+  });
+}
+
 Restaurant.findAll = () => {
   return new Promise(resolve => {
     db.query(

@@ -9,5 +9,13 @@ router.get('/profile/:id', CustomerController.getProfile);
 
 router.post('/favorite', CustomerController.favorite);
 
+router.get('/:id/favorites', CustomerController.getFavorites);
+
+router.get('/address', CustomerController.getAddress);
+
+router.post('/address', CustomerController.addAddress);
+
+router.get('/address/all', CustomerController.getAllAddresses);
+
 export default router;
 

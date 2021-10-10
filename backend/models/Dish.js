@@ -59,6 +59,40 @@ Dish.find = (restId, id) => {
   });
 }
 
+Dish.findMultiple = (restId, dishIds) => {
+  return new Promise(resolve => {
+    db.query(
+      'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id where restId=? and d.id in (?)',
+      [restId, dishIds],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result]);
+      }
+    );
+  });
+}
+
+Dish.findMultipleRestaurantDishes = (restIds, dishIds) => {
+  return new Promise(resolve => {
+    db.query(
+      'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id where restId in (?) and d.id in (?)',
+      [restIds, dishIds],
+      (err, result) => {
+        if (err) {
+          resolve([err, null]);
+          return;
+        }
+    
+        resolve([null, result]);
+      }
+    );
+  });
+}
+
 Dish.findAll = (restId) => {
   return new Promise(resolve => {
     db.query(

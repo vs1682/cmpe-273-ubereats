@@ -8,6 +8,7 @@ import dishRoutes from './routes/dish.js';
 import uploadRoutes from './routes/upload.js';
 import locationRoutes from './routes/location.js';
 import customerRoutes from './routes/customer.js';
+import orderRoutes from './routes/order.js';
 
 const app = express();
 
@@ -40,6 +41,8 @@ app.use('/api/dish', dishRoutes);
 app.use('/api/upload', uploadRoutes);
 
 app.use('/api/countries', locationRoutes);
+
+app.use('/api/order', orderRoutes);
 
 // set port, listen for requests
 app.listen(8000, () => {

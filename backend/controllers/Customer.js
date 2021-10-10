@@ -61,4 +61,80 @@ CustomerController.favorite = async (req, res) => {
   res.json(data);
 }
 
+CustomerController.getFavorites = async (req, res) => {
+  if (!req.params) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const [err, data] = await CustomerService.findFavorites({ custId: req.params.id });
+
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while fetching profile."
+    });
+  }
+
+  res.json(data);
+}
+
+CustomerController.addAddress = async (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const [err, data] = await CustomerService.addAddress(req.body);
+
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while adding address."
+    });
+  }
+
+  res.json(data);
+}
+
+CustomerController.getAddress = async (req, res) => {
+  if (!req.query) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const [err, data] = await CustomerService.findAddress(req.query);
+
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while fetching address."
+    });
+  }
+
+  res.json(data);
+}
+
+CustomerController.getAllAddresses = async (req, res) => {
+  if (!req.query) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const [err, data] = await CustomerService.findAllAddress(req.query);
+
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while fetching address."
+    });
+  }
+
+  res.json(data);
+}
+
 export default CustomerController;
