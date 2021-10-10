@@ -35,9 +35,18 @@ const addFavorite = createAsyncThunk(
   }
 );
 
+const fetchFavorites = createAsyncThunk(
+  'restaurant/favorite/fetch',
+  async (data) => {
+    const response = await CustomerApi.fetchFavorites(data);
+    return response;
+  }
+);
+
 export {
   addFavorite,
   fetchRestaurant,
   fetchAllRestaurant,
-  updateRestaurant
+  updateRestaurant,
+  fetchFavorites
 };

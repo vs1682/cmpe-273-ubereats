@@ -5,10 +5,13 @@ import {
   useRouteMatch
 } from "react-router-dom";
 
+import Layout from '../Organisms/Customer/Layout';
 import Profile from '../Organisms/Customer/Profile';
 import ProfileForm from '../Organisms/Customer/ProfileForm';
 import Dashboard from '../Organisms/Customer/Dashboard';
-import Layout from '../Organisms/Customer/Layout';
+import Checkout from '../Organisms/Customer/Checkout';
+import Orders from '../Organisms/Orders';
+import Favorites from '../Organisms/Customer/Favorites';
 
 const Customer = () => {
   let { path } = useRouteMatch();
@@ -24,6 +27,15 @@ const Customer = () => {
         </Route>
         <Route path={`${path}/dashboard`}>
           <Dashboard />
+        </Route>
+        <Route path={`${path}/checkout`}>
+          <Checkout />
+        </Route>
+        <Route path={`${path}/orders`}>
+          <Orders />
+        </Route>
+        <Route path={`${path}/favorites`}>
+          <Favorites />
         </Route>
       </Switch>
     </Layout>

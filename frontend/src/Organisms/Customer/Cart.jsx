@@ -1,7 +1,9 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useCart } from 'react-use-cart';
+import { Link } from 'react-router-dom';
 import { useStyletron } from 'baseui';
+import { Button } from 'baseui/button';
 import {
   Modal,
   ModalHeader,
@@ -11,7 +13,9 @@ import {
 } from 'baseui/modal';
 
 import CartItem from '../../Atoms/CartItem';
-import { Button } from 'baseui/button';
+import Centered from '../../Atoms/Centered';
+import cartIcon from '../../assets/trolley.svg';
+import { URLS } from '../../utils/constants';
 
 const Cart = ({
   isOpen,
@@ -21,9 +25,39 @@ const Cart = ({
   const { items, cartTotal } = useCart();
   const allRestaurants = useSelector(state => state.restaurant.all);
 
-  const restaurant = allRestaurants && items
+  const renderEmptyCart = () => {
+    return (
+      <Centered direction="column" horizontal vertical>
+        <div>
+          <img src={cartIcon} height={32} />
+        </div>
+        <p>Add items from a restaurant to start a new cart</p>
+      </Centered>
+    );
+  }
+
+  const renderCart = () => {
+    const restaurant = allRestaurants && items
     ? allRestaurants.find(r => r.credId == items[0].restId)
     : [];
+
+    return (
+      <>
+        <div className={css({ color: '#000000' })}>
+          <h1>{restaurant && restaurant.name}</h1>
+          {items.map(item => <CartItem item={item} />)}
+        </div>
+        <Link to={`${URLS.customer.checkout}`}>
+          <Button
+            className={css({ width: '100%', marginTop: '16px' })}
+            onClick={onClose}
+          >
+            Go to Checkout . ${cartTotal}
+          </Button>
+        </Link>
+      </>
+    );
+  }
 
   return (
     <Modal
@@ -47,15 +81,10 @@ const Cart = ({
     >
       <ModalHeader>Cart</ModalHeader>
       <ModalBody>
-        <div className={css({ color: '#000000' })}>
-          <h1>{restaurant && restaurant.name}</h1>
-          {items.map(item => <CartItem item={item} />)}
-        </div>
-        <Button
-          className={css({ width: '100%', marginTop: '16px' })}
-        >
-          Go to Checkout . ${cartTotal}
-        </Button>
+        {items && items.length > 0
+          ? renderCart()
+          : renderEmptyCart()
+        }
       </ModalBody>
     </Modal>
   );

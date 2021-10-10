@@ -1,6 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { fetchRestaurant, fetchAllRestaurant, addFavorite } from '../thunks/restaurant';
+import {
+  fetchRestaurant,
+  fetchAllRestaurant,
+  addFavorite,
+  fetchFavorites
+} from '../thunks/restaurant';
 import { LOCAL_STORE_KEYS } from '../../utils/constants';
 
 const fetchRestaurantReducer = (state, action) => {
@@ -20,6 +25,17 @@ const fetchAllRestaurantReducer = (state, action) => {
     return {
       ...state,
       all: action.payload
+    };
+  }
+
+  return state;
+}
+
+const fetchFavoriteRestaurantReducer = (state, action) => {
+  if (action.payload) {
+    return {
+      ...state,
+      favorites: action.payload
     };
   }
 
@@ -48,14 +64,18 @@ const customerFavoriteReducer = (state, action) => {
 
 export const restaurantSlice = createSlice({
   name: 'restaurant',
-  initialState: JSON.parse(localStorage.getItem(LOCAL_STORE_KEYS.user)) || {},
+  initialState: {
+    ...(JSON.parse(localStorage.getItem(LOCAL_STORE_KEYS.user)) || {}),
+    all: []
+  },
   reducers: {
     removeRestaurant: () => {}
   },
   extraReducers: {
     [fetchRestaurant.fulfilled]: fetchRestaurantReducer,
     [fetchAllRestaurant.fulfilled]: fetchAllRestaurantReducer,
-    [addFavorite.fulfilled]: customerFavoriteReducer
+    [addFavorite.fulfilled]: customerFavoriteReducer,
+    [fetchFavorites.fulfilled]: fetchFavoriteRestaurantReducer
   },
 })
 

@@ -37,4 +37,49 @@ CustomerApi.addFavorite = async (data) => {
   return response.json();
 }
 
+CustomerApi.addAddress = async (data) => {
+  const response = await fetch(`${API_URL}/api/customer/address`, {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  return response.json();
+}
+
+CustomerApi.getAddress = async ({ custId, addressId }) => {
+  const response = await fetch(`${API_URL}/api/customer/address?custId=${custId}&addressId=${addressId}`, {
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  return response.json();
+}
+
+CustomerApi.getAllAddresses = async ({ custId }) => {
+  const response = await fetch(`${API_URL}/api/customer/address/all?custId=${custId}`, {
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  return response.json();
+}
+
+CustomerApi.fetchFavorites = async (custId) => {
+  const response = await fetch(`${API_URL}/api/customer/${custId}/favorites`, {
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  return response.json();
+}
+
 export default CustomerApi;

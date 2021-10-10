@@ -4,7 +4,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import {Client as Styletron} from 'styletron-engine-atomic';
 import {Provider as StyletronProvider} from 'styletron-react';
 import {LightTheme, BaseProvider} from 'baseui';
-import { CartProvider } from "react-use-cart";
+import { CartProvider } from 'react-use-cart';
+import { SnackbarProvider } from 'baseui/snackbar';
 
 import store from './store';
 import AppRouter from './Routes/index';
@@ -16,11 +17,13 @@ export default function Hello() {
     <Provider store={store}>
       <StyletronProvider value={engine}>
         <BaseProvider theme={LightTheme}>
-          <CartProvider>
-            <Router>
-              <AppRouter />
-            </Router>
-          </CartProvider>
+          <SnackbarProvider>
+            <CartProvider>
+              <Router>
+                <AppRouter />
+              </Router>
+            </CartProvider>
+          </SnackbarProvider>
         </BaseProvider>
       </StyletronProvider>
     </Provider>

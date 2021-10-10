@@ -15,6 +15,7 @@ import RestaurantProfile from '../Organisms/Restaurant/RestaurantProfile';
 import RestaurantProfileForm from '../Organisms/Restaurant/RestaurantProfileForm';
 import EditableDishes from '../Organisms/Restaurant/EditableDishes';
 import RestaurantProfileAndDishes from '../Organisms/Restaurant/RestaurantProfileAndDishes';
+import Orders from '../Organisms/Orders';
 
 const Restaurant = () => {
   let { path } = useRouteMatch();
@@ -33,6 +34,9 @@ const Restaurant = () => {
         </Route>
         <Route path={`${path}/dishes`}>
           <EditableDishes />
+        </Route>
+        <Route path={`${path}/orders`}>
+          <Orders />
         </Route>
         <Route exact path={path}>
           <RestaurantProfile />

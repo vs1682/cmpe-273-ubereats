@@ -6,6 +6,7 @@ import { useCart } from 'react-use-cart';
 import {Grid, Cell} from 'baseui/layout-grid';
 import { useStyletron } from 'baseui';
 import { Spinner } from "baseui/spinner";
+import { useSnackbar } from 'baseui/snackbar';
 
 import { fetchRestaurant } from '../../store/thunks/restaurant';
 import { fetchAllDishes, fetchDishCategories } from '../../store/thunks/dish';
@@ -17,8 +18,9 @@ import DishCard from '../../Molecule/DishCard';
 const RestaurantProfileAndDishes = () => {
   const dispatch = useDispatch();
   const [css] = useStyletron();
-  const { addItem, getItem, updateItemQuantity } = useCart();
+  const { items, addItem, getItem, updateItemQuantity } = useCart();
   const { id: restaurantId } = useParams();
+  const { enqueue } = useSnackbar();
   const restaurant = useSelector(state => state.restaurant.selected || {});
   const dishes = useSelector(state => state.dish.all);
   const categories = useSelector(state => state.dish.categories);
@@ -39,7 +41,18 @@ const RestaurantProfileAndDishes = () => {
 
   const renderDish = (d) => {
     const item = getItem(d.id);
-    let onAddItem = () => addItem(d);
+    let onAddItem = () => {
+      if (items.length) {
+        const item = items[0];
+        const alreadyAddedRestaurantId = item.restId;
+
+        if (alreadyAddedRestaurantId != restaurant.credId) {
+          enqueue({ message: 'You cannot add dishes from different restaurants' });
+          return;
+        }
+      }
+      addItem(d)
+    };
     let onRemoveItem = () => {};
 
     if (item) {

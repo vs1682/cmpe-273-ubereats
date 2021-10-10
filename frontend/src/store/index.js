@@ -6,6 +6,7 @@ import restaurantReducer from './slices/restaurant';
 import dishReducer from './slices/dish';
 import customerReducer from './slices/customer';
 import countriesReducer from './slices/countries';
+import orderReducer from './slices/order';
 
 export default configureStore({
   reducer: {
@@ -13,7 +14,8 @@ export default configureStore({
     restaurant: restaurantReducer,
     dish: dishReducer,
     customer: customerReducer,
-    countries: countriesReducer
+    countries: countriesReducer,
+    order: orderReducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
 });

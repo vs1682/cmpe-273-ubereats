@@ -58,12 +58,16 @@ const DrawerMenu = ({
       <MenuItem>
         <img src={orderIcon} width="24px" height="24px" alt="order icon" />
         <Space horizontal size={2} />
-        Orders
+        <StyledLink href={URLS.customer.orders}>
+          Orders
+        </StyledLink>
       </MenuItem>
       <MenuItem>
         <img src={favoriteIcon} width="24px" height="24px" alt="favorite icon" />
         <Space horizontal size={2} />
-        Favorite
+        <StyledLink href={URLS.customer.favorites}>
+          Favorite
+        </StyledLink>
       </MenuItem>
       <MenuItem>
         <StyledLink href={URLS.login.signOut}>

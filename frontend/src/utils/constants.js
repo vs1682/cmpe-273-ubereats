@@ -15,7 +15,11 @@ const LOGIN_URLS = {
 
 const CUSTOMER_URLS = {
   base: '/customer',
-  edit: '/customer/edit'
+  edit: '/customer/edit',
+  dashboard: '/customer/dashboard',
+  checkout: '/customer/checkout',
+  orders: '/customer/orders',
+  favorites: '/customer/favorites'
 }
 
 const RESTAURANT_URLS = {
@@ -25,10 +29,16 @@ const RESTAURANT_URLS = {
   orders: '/restaurant/orders'
 }
 
+const ORDER_URLS = {
+  base: '/order',
+  all: '/orders'
+}
+
 export const URLS = {
   login: LOGIN_URLS,
   customer: CUSTOMER_URLS,
-  restaurant: RESTAURANT_URLS
+  restaurant: RESTAURANT_URLS,
+  order: ORDER_URLS
 }
 
 export const API_URL = 'http://localhost:8000';

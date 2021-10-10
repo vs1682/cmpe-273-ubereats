@@ -15,11 +15,14 @@ import SignOut from '../Organisms/SignOut';
 
 import { USER_TYPE, URLS } from '../utils/constants';
 import { getUser } from '../store/selectors/user';
+import useFetchInitialDataForCustomer from '../hooks/useFetchInitialDataForCustomer';
 
 const AppRouter = () => {
   const location = useLocation();
   const history = useHistory();
   const user = useSelector(getUser);
+
+  useFetchInitialDataForCustomer();
 
   useEffect(() => {
     const loginUrls = Object.values(URLS.login);
@@ -32,7 +35,7 @@ const AppRouter = () => {
     }
 
     if (isUserLoggedIn && (isLoginUrl || isIndexUrl)) {
-      const nextPath = user.accountRole == USER_TYPE.customer ? URLS.customer.base : URLS.restaurant.base;
+      const nextPath = user.accountRole == USER_TYPE.customer ? URLS.customer.dashboard : URLS.restaurant.base;
       history.push(nextPath);
     }
   }, [location, user]);

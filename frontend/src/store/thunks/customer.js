@@ -18,7 +18,34 @@ const updateCustomerProfile = createAsyncThunk(
   }
 );
 
+const addCustomerAddress = createAsyncThunk(
+  'customer/address/create',
+  async (data) => {
+    const response = await CustomerApi.addAddress(data);
+    return response;
+  }
+);
+
+const fetchCustomerAddress = createAsyncThunk(
+  'customer/address',
+  async (data) => {
+    const response = await CustomerApi.getAddress(data);
+    return response;
+  }
+);
+
+const fetchCustomerAllAddresses = createAsyncThunk(
+  'customer/address/all',
+  async (data) => {
+    const response = await CustomerApi.getAllAddresses(data);
+    return response;
+  }
+);
+
 export {
+  fetchCustomerAddress,
+  fetchCustomerAllAddresses,
   fetchCustomerProfile,
-  updateCustomerProfile
+  updateCustomerProfile,
+  addCustomerAddress
 }
