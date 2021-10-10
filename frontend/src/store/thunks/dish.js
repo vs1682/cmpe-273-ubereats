@@ -6,7 +6,10 @@ const createDish = createAsyncThunk(
   'dish/create',
   async (data) => {
     const response = await DishApi.create(data);
-    return response;
+    return {
+      ...response,
+      imageUrl: data.imageUrl
+    };
   }
 );
 
@@ -30,7 +33,10 @@ const updateDish = createAsyncThunk(
   'dish/update',
   async (data) => {
     const response = await DishApi.update(data);
-    return response;
+    return {
+      ...response,
+      imageUrl: data.imageUrl
+    };
   }
 );
 

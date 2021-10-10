@@ -1,0 +1,9 @@
+import supertest from 'supertest';
+import chai from 'chai';
+import uuid from 'uuid';
+import app from '../server.js';
+
+global.app = app;
+global.uuid = uuid;
+global.expect = chai.expect;
+global.request = supertest(app);

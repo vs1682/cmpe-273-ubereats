@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import OrderService from '../services/Order.js';
 
 const OrderController = {};
@@ -40,6 +41,28 @@ OrderController.findById = async (req, res) => {
   res.json(data);
 }
 
+OrderController.updateOrderStatus = async (req, res) => {
+  if (!req.params) {
+    res.status(400).send({
+      message: "Required fields not present"
+    });
+  }
+
+  const [err, data] = await OrderService.updateOrderStatus({
+    orderId: parseInt(req.params.id),
+    status: parseInt(req.params.status)
+  });
+
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while updating order status."
+    });
+  }
+
+  res.json(data);
+}
+
 OrderController.findAllByCustomer = async (req, res) => {
   if (!req.params) {
     res.status(400).send({
@@ -47,7 +70,14 @@ OrderController.findAllByCustomer = async (req, res) => {
     });
   }
 
-  const [err, data] = await OrderService.findAllByCustomer({ custId: req.params.id });
+  const custId = _.get(req, 'params.id');
+  let filters = _.get(req, 'query.filters');
+  filters = filters && JSON.parse(filters);
+
+  const [err, data] = await OrderService.findAllByCustomer({
+    custId,
+    filters
+  });
 
   if (err) {
     res.status(500).send({
@@ -66,12 +96,29 @@ OrderController.findAllByRestaurant = async (req, res) => {
     });
   }
 
-  const [err, data] = await OrderService.findAllByRestaurant({ restId: req.params.id });
+  const restId = _.get(req, 'params.id');
+  let filters = _.get(req, 'query.filters');
+  filters = filters && JSON.parse(filters);
+
+  const [err, data] = await OrderService.findAllByRestaurant({ restId, filters });
 
   if (err) {
     res.status(500).send({
       message:
       err.message || "Some error occurred while fetching orders."
+    });
+  }
+
+  res.json(data);
+}
+
+OrderController.getOrderStatuses = async (req, res) => {
+  const [err, data] = await OrderService.findAllStatuses();
+  
+  if (err) {
+    res.status(500).send({
+      message:
+      err.message || "Some error occurred while fetching order statuses."
     });
   }
 

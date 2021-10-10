@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
 import { useHistory } from 'react-router-dom';
@@ -8,6 +8,11 @@ import { Input } from "baseui/input";
 import { Button } from 'baseui/button';
 import { Textarea } from 'baseui/textarea';
 import { Cell, Grid } from 'baseui/layout-grid';
+import {
+  Checkbox,
+  LABEL_PLACEMENT
+} from "baseui/checkbox";
+
 
 import Space from '../../Atoms/Space';
 import ImageUploader from '../../Molecule/ImageUploader';
@@ -21,6 +26,7 @@ const RestaurantProfileForm = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const { handleSubmit, reset, control } = useForm();
+  const [deliveryModeAllowed, setDeliveryModeAllowed] = useState(false);
   const [css] = useStyletron();
   const profile = useSelector(state => state.restaurant || {});
   const [imgUrl, onUploadImg] = useUploadImage(profile.profilePicUrl);
@@ -29,7 +35,8 @@ const RestaurantProfileForm = () => {
     dispatch(updateRestaurant({
       ...profile,
       ..._.omitBy(data, v => !v),
-      profilePicUrl: imgUrl
+      profilePicUrl: imgUrl,
+      deliveryModeAllowed
     }))
 
     if (profile) {
@@ -43,7 +50,7 @@ const RestaurantProfileForm = () => {
       location: profile.location,
       description: profile.description,
       phone: profile.phone,
-      timings: profile.timing,
+      timing: profile.timing
     });
   }, [profile]);
 
@@ -99,10 +106,22 @@ const RestaurantProfileForm = () => {
             <Grid>
               <Cell span={12}>
                 <Controller
-                  name="timings"
+                  name="timing"
                   control={control}
                   render={({ field }) => <Textarea placeholder="Timings" {...field} />}
                 />
+              </Cell>
+            </Grid>
+            <Space />
+            <Grid>
+              <Cell span={12}>
+                <Checkbox
+                  checked={deliveryModeAllowed}
+                  onChange={e => setDeliveryModeAllowed(e.target.checked)}
+                  labelPlacement={LABEL_PLACEMENT.right}
+                >
+                  Delivery Mode Allowed
+                </Checkbox>
               </Cell>
             </Grid>
           </Cell>

@@ -25,8 +25,8 @@ OrderApi.fetchById = async (id) => {
   return response.json();
 }
 
-OrderApi.fetchAllByCustomer = async (id) => {
-  const response = await fetch(`${API_URL}/api/order/customer/${id}`, {
+OrderApi.fetchAllByCustomer = async (id, filters) => {
+  const response = await fetch(`${API_URL}/api/order/customer/${id}?filters=${JSON.stringify(filters)}`, {
     method: 'get',
     headers: {
       'Content-Type': 'application/json'
@@ -36,8 +36,30 @@ OrderApi.fetchAllByCustomer = async (id) => {
   return response.json();
 }
 
-OrderApi.fetchAllByRestaurant = async (id) => {
-  const response = await fetch(`${API_URL}/api/order/restaurant/${id}`, {
+OrderApi.fetchAllByRestaurant = async (id, filters) => {
+  const response = await fetch(`${API_URL}/api/order/restaurant/${id}?filters=${JSON.stringify(filters)}`, {
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  return response.json();
+}
+
+OrderApi.fetchAllStatuses = async () => {
+  const response = await fetch(`${API_URL}/api/order/statuses`, {
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  return response.json();
+}
+
+OrderApi.updateOrderStatus = async (orderId, status) => {
+  const response = await fetch(`${API_URL}/api/order/${orderId}/status/${status}`, {
     method: 'get',
     headers: {
       'Content-Type': 'application/json'

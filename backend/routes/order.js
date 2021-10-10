@@ -5,7 +5,11 @@ const router = express.Router();
 
 router.post('/create', OrderController.create);
 
+router.get('/statuses', OrderController.getOrderStatuses);
+
 router.get('/:id', OrderController.findById);
+
+router.get('/:id/status/:status', OrderController.updateOrderStatus);
 
 router.get('/customer/:id', OrderController.findAllByCustomer);
 

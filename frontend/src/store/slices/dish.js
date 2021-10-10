@@ -14,7 +14,7 @@ const createDishReducer = (state, action) => {
   if (action.payload) {
     return {
       ...state,
-      all: state.all.push(action.payload),
+      all: [...state.all, action.payload],
       selected: action.payload,
     };
   }
@@ -118,7 +118,12 @@ export const dishSlice = createSlice({
     types: []
   },
   reducers: {
-    removeDish: () => {}
+    removeDish: (state) => {
+      return {
+        ...state,
+        selected: null
+      }
+    }
   },
   extraReducers: {
     [createDish.fulfilled]: createDishReducer,

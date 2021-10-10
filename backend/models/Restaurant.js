@@ -75,11 +75,31 @@ Restaurant.findMultiple = (restIds) => {
   });
 }
 
-Restaurant.findAll = () => {
+Restaurant.findAll = (filters) => {
   return new Promise(resolve => {
+    let sqlQuery =  'select * from restaurantProfile';
+    let values = [];
+    let addConnectors = false;
+
+    if (filters) {
+      if (filters.deliveryMode) {
+        sqlQuery += ' where deliveryModeAllowed = ?';
+        values.push(1);
+        addConnectors = true;
+      }
+  
+      if (filters.searchText) {
+        const connectingText = addConnectors ? ' and' : ' where';
+        sqlQuery += `${connectingText} (name like '%${filters.searchText}%' or location like '%${filters.searchText}%')`;
+      }
+    }
+
+    console.log('---SQL FILTERS----', filters)
+    console.log('---SQL----', sqlQuery)
+
     db.query(
-      'select * from restaurantProfile',
-      [],
+      sqlQuery,
+      values,
       (err, result) => {
         if (err) {
           resolve([err, null]);

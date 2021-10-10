@@ -16,6 +16,7 @@ import SignOut from '../Organisms/SignOut';
 import { USER_TYPE, URLS } from '../utils/constants';
 import { getUser } from '../store/selectors/user';
 import useFetchInitialDataForCustomer from '../hooks/useFetchInitialDataForCustomer';
+import useFetchInitialDataForRestaurant from '../hooks/useFetchInitialDataForRestaurant';
 
 const AppRouter = () => {
   const location = useLocation();
@@ -23,6 +24,7 @@ const AppRouter = () => {
   const user = useSelector(getUser);
 
   useFetchInitialDataForCustomer();
+  useFetchInitialDataForRestaurant();
 
   useEffect(() => {
     const loginUrls = Object.values(URLS.login);

@@ -67,12 +67,11 @@ CredsController.signIn = async (req, res) => {
       message:
         err.message || "Some error occurred while signing in."
     });
+    return;
   }
 
   let profileErr = null;
   let profileData = {};
-
-  console.log('----profileData----', profileData, data)
 
   if (data.accountRole === USER_TYPE.customer) {
     [profileErr, profileData] = await Customer.find({

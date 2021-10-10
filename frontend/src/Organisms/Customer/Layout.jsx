@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useCart } from 'react-use-cart';
+import _ from 'lodash';
 import { Button } from 'baseui/button';
 import {
   HeaderNavigation,
@@ -14,13 +15,31 @@ import { Menu } from "baseui/icon";
 import BrandLogo from '../../Atoms/BrandLogo';
 import CartButton from '../../Molecule/CartButton';
 import DrawerMenu from '../../Molecule/DrawerMenu';
+import Toggle from '../../Molecule/Toggle';
 import Cart from './Cart';
+import { setRestaurantFilters } from '../../store/slices/filters';
+import { fetchAllRestaurant } from '../../store/thunks/restaurant';
 
 const Layout = ({ children }) => {
+  const dispatch = useDispatch();
   const { totalItems  } = useCart();
   const profile = useSelector(state => state.customer.profile);
+  const restaurantFilters = useSelector(state => state.filters.restaurant);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [isCartOpen, setCartOpen] = useState(false);
+
+  const fetchFilteredRestaurants = (filters) => {
+    dispatch(fetchAllRestaurant({custId: profile.credId, filters}));
+  }
+
+  const onChangeSearchText = _.debounce(
+    (e) => {
+      const searchText = e && e.target ? e.target.value: '';
+      dispatch(setRestaurantFilters({ searchText }));
+      fetchFilteredRestaurants({...restaurantFilters, searchText});
+    },
+    300
+  )
 
   return (
     <>
@@ -37,13 +56,36 @@ const Layout = ({ children }) => {
             </a>
           </NavigationItem>
         </NavigationList>
-        <NavigationList $align={ALIGN.center} />
+        <NavigationList $align={ALIGN.center}>
+          <Toggle
+            options={[
+              {label: 'Delivery', value: true},
+              {label: 'Pickup', value: false}
+            ]}
+            onToggle={value => {
+              dispatch(
+                setRestaurantFilters({
+                  ...restaurantFilters,
+                  deliveryMode: value
+                })
+              );
+              fetchFilteredRestaurants({
+                ...restaurantFilters,
+                deliveryMode: value
+              });
+            }}
+          />
+        </NavigationList>
         <NavigationList $align={ALIGN.right}>
-          <NavigationItem style={{width: '200px'}}>
+          <NavigationItem style={{width: '400px'}}>
             <Search
               options={[]}
               type={TYPE.search}
-              onChange={() => {}}
+              onBlurResetsInput={false}
+              onCloseResetsInput={false}
+              onInputChange={onChangeSearchText}
+              onChange={onChangeSearchText}
+              placeholder="What are you craving?"
             />
           </NavigationItem>
           <NavigationItem>
@@ -53,6 +95,7 @@ const Layout = ({ children }) => {
       </HeaderNavigation>
       <DrawerMenu
         userName={profile.fullname}
+        profilePicUrl={profile.profilePicUrl}
         onClose={() => setDrawerOpen(false)}
         isOpen={isDrawerOpen}
       />

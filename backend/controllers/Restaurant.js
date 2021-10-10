@@ -43,6 +43,7 @@ RestaurantController.findById = async (req, res) => {
 }
 
 RestaurantController.findAll = async (req, res) => {
+  console.log('----REST QUERY----', req.query);
   const [err, data] = await RestaurantService.findAll(req.query);
 
   if (err) {

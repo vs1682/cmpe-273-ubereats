@@ -93,11 +93,37 @@ Dish.findMultipleRestaurantDishes = (restIds, dishIds) => {
   });
 }
 
-Dish.findAll = (restId) => {
+Dish.findAll = (restId, filters) => {
+  let sqlQuery = 'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id';
+  let values = [];
+  let addConnectors = false;
+
+  if (restId) {
+    sqlQuery += ' where restId = ?';
+    values.push(restId);
+    addConnectors = true;
+  }
+
+  if (filters) {
+    if (filters.types) {
+      const connectingText = addConnectors ? ' and' : ' where';
+      sqlQuery += connectingText + ' type in (?)';
+      values.push(filters.types);
+      addConnectors = true;
+    }
+
+    if (filters.searchText) {
+      const connectingText = addConnectors ? ' and' : ' where';
+      sqlQuery += `${connectingText} (name like '%${filters.searchText}%')`;
+    }
+  }
+
+  console.log('---SQL----', sqlQuery)
+
   return new Promise(resolve => {
     db.query(
-      'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id where restId=?',
-      [restId],
+      sqlQuery,
+      values,
       (err, result) => {
         if (err) {
           resolve([err, null]);

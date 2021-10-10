@@ -26,9 +26,6 @@ const Restaurant = () => {
   return (
     <Layout>
       <Switch>
-        <Route exact path={`${path}/:id`}>
-          <RestaurantProfileAndDishes />
-        </Route>
         <Route path={`${path}/edit`}>
           <RestaurantProfileForm />
         </Route>
@@ -37,6 +34,9 @@ const Restaurant = () => {
         </Route>
         <Route path={`${path}/orders`}>
           <Orders />
+        </Route>
+        <Route exact path={`${path}/:id`}>
+          <RestaurantProfileAndDishes />
         </Route>
         <Route exact path={path}>
           <RestaurantProfile />

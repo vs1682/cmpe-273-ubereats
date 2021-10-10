@@ -45,7 +45,7 @@ const Cart = ({
       <>
         <div className={css({ color: '#000000' })}>
           <h1>{restaurant && restaurant.name}</h1>
-          {items.map(item => <CartItem item={item} />)}
+          {items.map(item => <CartItem key={item.id} item={item} />)}
         </div>
         <Link to={`${URLS.customer.checkout}`}>
           <Button

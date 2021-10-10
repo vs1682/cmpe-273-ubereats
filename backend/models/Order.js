@@ -7,6 +7,7 @@ const Order = function(order) {
   this.amount = order.amount;
   this.deliveryMode = order.deliveryMode;
   this.orderedAt = order.orderedAt;
+  this.status = order.status;
 };
 
 const OrderItem = function(order) {
@@ -24,6 +25,19 @@ Order.create = (order) => {
       }
   
       resolve([null, { ...order, orderId: result.insertId }]);
+    });
+  });
+}
+
+Order.updateOrderStatus = (order) => {
+  return new Promise(resolve => {
+    db.query("update orders SET status = ? where orderId = ?", [order.status, order.orderId], (err) => {
+      if (err) {
+        resolve([err, null]);
+        return;
+      }
+  
+      resolve([null, { ...order }]);
     });
   });
 }
@@ -80,9 +94,42 @@ Order.findMultipleOrderItems = (orderIds) => {
   });
 }
 
-Order.findAllByCustomer = ({ custId }) => {
+Order.findAllByCustomer = ({ custId, filters }) => {
+  let sqlQuery = 'select * from orders where custId = ?';
+  let values = [custId];
+
+  if (filters) {
+    if (filters.status) {
+      sqlQuery += ' and status = ?';
+      values.push(`${filters.status}`);
+    }
+  }
+
   return new Promise(resolve => {
-    db.query("select * from orders where custId = ?", [custId], (err, result) => {
+    db.query(sqlQuery, values, (err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
+      }
+
+      resolve([null, result]);
+    });
+  });
+}
+
+Order.findAllByRestaurant = ({ restId, filters }) => {
+  let sqlQuery = 'select * from orders where restId = ?';
+  let values = [restId];
+
+  if (filters) {
+    if (filters.status) {
+      sqlQuery += ' and status = ?';
+      values.push(`${filters.status}`);
+    }
+  }
+
+  return new Promise(resolve => {
+    db.query(sqlQuery, values, (err, result) => {
       if (err) {
         resolve([err, null]);
         return;
@@ -93,9 +140,9 @@ Order.findAllByCustomer = ({ custId }) => {
   });
 }
 
-Order.findAllByRestaurant = ({ restId }) => {
+Order.findAllStatuses = () => {
   return new Promise(resolve => {
-    db.query("select * from orders where restId = ?", [restId], (err, result) => {
+    db.query("select * from orderStatus", [], (err, result) => {
       if (err) {
         resolve([err, null]);
         return;

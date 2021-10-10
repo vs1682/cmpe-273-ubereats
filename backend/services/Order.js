@@ -14,8 +14,11 @@ OrderService.create = async (data) => {
     amount,
     deliveryMode,
     orderedAt,
-    dishes
+    dishes,
+    status
   } = data;
+
+  let err, createdOrder;
 
   if (dishes) {
     const order = new Order({
@@ -23,12 +26,14 @@ OrderService.create = async (data) => {
       restId,
       amount,
       deliveryMode,
-      orderedAt
+      orderedAt,
+      status
     });
 
-    const [err, { orderId }] = await Order.create(order);
+    [err, createdOrder] = await Order.create(order);
 
     if (!err) {
+      const { orderId } = createdOrder;
       const orderItems = dishes.map(({ dishId, quantity }) => {
         return [orderId, dishId, quantity];
       });
@@ -37,7 +42,7 @@ OrderService.create = async (data) => {
     }
   }
 
-  return [{ message: 'No items in order' }, null];
+  return [err || { message: 'No items in order' }, null];
 }
 
 OrderService.findById = async (query) => {
@@ -78,9 +83,14 @@ OrderService.findAllByRestaurant = async (query) => {
   const [err, orders] = await Order.findAllByRestaurant(query);
 
   if (!err) {
-    const [errItems, orderItems] = await Order.findMultipleOrderItems(orders.map(o => o.orderId));
+    const orderIds = orders.map(o => o.orderId);
+    let errItems, orderItems;
 
-    if (!errItems) {
+    if (orderIds.length) {
+      [errItems, orderItems] = await Order.findMultipleOrderItems(orders.map(o => o.orderId));
+    }
+
+    if (!errItems && orderItems) {
       const custIds = orders.map(o => o.custId);
       const dishIds = orderItems.map(i => i.dishId);
       const [[errRest, customers], [errDish, dishes]] = await Promise.all([
@@ -108,19 +118,24 @@ OrderService.findAllByRestaurant = async (query) => {
       }
     }
 
-    return [errItems, null];
+    return [errItems, []];
   }
 
-  return [err, null];
+  return [err, []];
 }
 
 OrderService.findAllByCustomer = async (query) => {
   const [err, orders] = await Order.findAllByCustomer(query);
 
   if (!err) {
-    const [errItems, orderItems] = await Order.findMultipleOrderItems(orders.map(o => o.orderId));
+    const orderIds = orders.map(o => o.orderId);
+    let errItems, orderItems;
 
-    if (!errItems) {
+    if (orderIds.length) {
+      [errItems, orderItems] = await Order.findMultipleOrderItems(orderIds);
+    }
+
+    if (!errItems && orderItems) {
       const restIds = orders.map(o => o.restId);
       const dishIds = orderItems.map(i => i.dishId);
       const [[errRest, restaurants], [errDish, dishes]] = await Promise.all([
@@ -148,10 +163,18 @@ OrderService.findAllByCustomer = async (query) => {
       }
     }
 
-    return [errItems, null];
+    return [errItems, []];
   }
 
-  return [err, null];
+  return [err, []];
+}
+
+OrderService.findAllStatuses = async () => {
+  return Order.findAllStatuses();
+}
+
+OrderService.updateOrderStatus = async (query) => {
+  return Order.updateOrderStatus(query);
 }
 
 export default OrderService;

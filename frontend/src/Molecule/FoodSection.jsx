@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 import RestaurantCard from './RestaurantCard';
 import { URLS } from '../utils/constants';
+import Space from '../Atoms/Space';
 
 const FoodSection = ({
   heading,
@@ -17,11 +18,12 @@ const FoodSection = ({
   return (
     <div>
       {heading && (<Display4 className={css({ marginBottom: '8px' })}>{heading}</Display4>)}
-      {desc && (<span>{desc}</span>)}
+      {desc && (<div className={css({ color: '#545454', fontSize: '14px', marginTop: '-8px' })}>{desc}</div>)}
+      {desc && <Space />}
       <div className={css({
         display: 'flex',
         flexWrap: 'wrap',
-        margin: '0 16px'
+        margin: '0 16px 0 0'
       })}>
         {restaurants.map(r => (
           <Link
@@ -35,6 +37,7 @@ const FoodSection = ({
             <div key={r.id} className={css({
               width: `${(window.innerWidth / restaurants.length)}px`,
               minWidth: '160px',
+              maxWidth: '240px',
               padding: '16px 16px 16px 0',
             })}>
               <RestaurantCard

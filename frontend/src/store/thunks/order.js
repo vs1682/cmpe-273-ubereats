@@ -20,16 +20,32 @@ const fetchOrder = createAsyncThunk(
 
 const fetchOrderByCustomer = createAsyncThunk(
   'order/customer/fetch',
-  async (id) => {
-    const response = await OrderApi.fetchAllByCustomer(id);
+  async ({ id, filters }) => {
+    const response = await OrderApi.fetchAllByCustomer(id, filters);
     return response;
   }
 );
 
 const fetchOrderByRestaurant = createAsyncThunk(
   'order/restaurant/fetch',
-  async (id) => {
-    const response = await OrderApi.fetchAllByRestaurant(id);
+  async ({ id, filters }) => {
+    const response = await OrderApi.fetchAllByRestaurant(id, filters);
+    return response;
+  }
+);
+
+const fetchOrderStatuses = createAsyncThunk(
+  'order/statuses/fetch',
+  async () => {
+    const response = await OrderApi.fetchAllStatuses();
+    return response;
+  }
+);
+
+const updateOrderStatus = createAsyncThunk(
+  'order/status/update',
+  async ({ orderId, status }) => {
+    const response = await OrderApi.updateOrderStatus(orderId, status);
     return response;
   }
 );
@@ -38,5 +54,7 @@ export {
   createOrder,
   fetchOrder,
   fetchOrderByCustomer,
-  fetchOrderByRestaurant
+  fetchOrderByRestaurant,
+  fetchOrderStatuses,
+  updateOrderStatus
 };

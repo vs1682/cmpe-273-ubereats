@@ -19,12 +19,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-  if (req.method === 'POST') {
-    console.log('---REQUEST BODY---', req.body);
-  } else {
-    console.log('---REQUEST QUERY---', req.query);
-    console.log('---REQUEST PARAM---', req.params);
-  }
+  // if (req.method === 'POST') {
+  //   console.log('---REQUEST BODY---', req.body);
+  // } else {
+  //   console.log('---REQUEST QUERY---', req.query);
+  //   console.log('---REQUEST PARAM---', req.params);
+  // }
   // console.log('---REQUEST PARAM---', req.file, req.files);
 
   next();
@@ -48,3 +48,5 @@ app.use('/api/order', orderRoutes);
 app.listen(8000, () => {
   console.log("Server is running on port 8000.");
 });
+
+export default app;

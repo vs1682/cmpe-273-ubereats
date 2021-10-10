@@ -13,8 +13,8 @@ const fetchRestaurant = createAsyncThunk(
 
 const fetchAllRestaurant = createAsyncThunk(
   'restaurant/all/fetch',
-  async (customerId) => {
-    const response = await RestaurantApi.getAll(customerId);
+  async ({ custId, filters }) => {
+    const response = await RestaurantApi.getAll(custId, filters);
     return response;
   }
 );

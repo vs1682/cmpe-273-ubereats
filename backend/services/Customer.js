@@ -49,16 +49,18 @@ CustomerService.findFavorites = async (query) => {
   if (!err) {
     const restIds = result.map(r => r.restId);
 
-    let [errRest, restaurants] = await Restaurant.findMultiple(restIds);
+    if (restIds.length) {
+      let [errRest, restaurants] = await Restaurant.findMultiple(restIds);
 
-    if (!errRest) {
-      restaurants = restaurants.map(r => {
-        r.isFavorite = true;
-        return r;
-      });
+      if (!errRest) {
+        restaurants = restaurants.map(r => {
+          r.isFavorite = true;
+          return r;
+        });
+      }
+
+      return [errRest, restaurants];
     }
-
-    return [errRest, restaurants];
   }
 
   return [err, null];

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCart } from 'react-use-cart';
-import { round } from 'lodash';
-import { Link } from 'react-router-dom';
+import _, { round } from 'lodash';
+import { Link, useHistory } from 'react-router-dom';
 import { styled, useStyletron } from 'baseui';
 import { RadioGroup, Radio } from 'baseui/radio';
 import { Button, SIZE, SHAPE } from 'baseui/button';
@@ -15,6 +15,7 @@ import CartItem from '../../Atoms/CartItem';
 import AddAddressForm from './AddAddressForm';
 import { fetchCustomerAllAddresses } from '../../store/thunks/customer';
 import { createOrder } from '../../store/thunks/order';
+import { fetchRestaurant } from '../../store/thunks/restaurant';
 import { selectAddress } from '../../store/slices/customer';
 import { URLS } from '../../utils/constants';
 
@@ -26,21 +27,25 @@ const SpaceBetweenContainer = styled('div', {
 
 const Checkout = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [css] = useStyletron();
-  const { items, cartTotal } = useCart();
+  const { emptyCart, items, cartTotal } = useCart();
   const { enqueue } = useSnackbar();
   const [openAddAddressModal, setOpenAddAddressModal] = useState(false);
   const user = useSelector(state => state.user);
-  const allRestaurants = useSelector(state => state.restaurant.all);
+  const restaurant = useSelector(state => state.restaurant.selected || {});
   const allAddresses = useSelector(state => state.customer.address.all);
   const selectedAddress = useSelector(state => state.customer.address.selected);
 
-  const restaurant = allRestaurants && items
-    ? allRestaurants.find(r => r.credId == items[0].restId)
-    : [];
-
   useEffect(() => {
     dispatch(fetchCustomerAllAddresses({ custId: user.credId }));
+  }, []);
+
+  useEffect(() => {
+    const restId = _.get(items, '[0].restId');
+    if (restId) {
+      dispatch(fetchRestaurant(restId));
+    }
   }, []);
 
   const getAmountBreakup = () => ({
@@ -60,9 +65,13 @@ const Checkout = () => {
       restId: restaurant.credId,
       dishes: items.map(i => ({dishId: i.id, quantity: i.quantity})),
       amount: getAmountBreakup().total,
-      deliveryMode: true,
+      status: 1,
+      deliveryMode: restaurant.deliveryModeAllowed,
       orderedAt: new Date()
-    }))
+    }));
+
+    emptyCart();
+    history.push(URLS.customer.dashboard);
   }
 
   const onSelectAddress = (e) => {
@@ -134,7 +143,7 @@ const Checkout = () => {
             </Button>
           </Link>
         </div>
-        {items.map(item => <CartItem item={item} />)}
+        {items.map(item => <CartItem key={item.id} item={item} />)}
       </div>
     );
   }

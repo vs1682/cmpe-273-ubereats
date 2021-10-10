@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import _ from 'lodash';
 import {Grid, Cell} from 'baseui/layout-grid';
 import { useStyletron } from 'baseui';
@@ -8,30 +8,12 @@ import { Avatar } from "baseui/avatar";
 import { Link,useRouteMatch } from 'react-router-dom';
 
 import Centered from '../../Atoms/Centered';
-import { fetchCustomerProfile } from '../../store/thunks/customer';
-import { fetchDetails } from '../../store/thunks/countries';
 
 const Profile = () => {
-  const dispatch = useDispatch();
   const [css] = useStyletron();
   const { url } = useRouteMatch();
-  const user = useSelector(state => state.user);
   const profile = useSelector(state => state.customer.profile || {});
   const countryDetails = useSelector(state => state.countries.details || {});
-
-  useEffect(() => {
-    dispatch(fetchCustomerProfile(user.credId));
-  }, []);
-
-  useEffect(() => {
-    if (profile && profile.credId) {
-      dispatch(fetchDetails({
-        country: profile.country,
-        state: profile.state,
-        city: profile.city
-      }));
-    }
-  }, [profile]);
 
   return (
     <Centered
@@ -57,7 +39,7 @@ const Profile = () => {
         <Grid>
           <Cell span={9}>
             <Avatar
-              name="Vishal Shinde"
+              name={profile.fullname}
               size="scale1600"
               src={profile.profilePicUrl}
             />

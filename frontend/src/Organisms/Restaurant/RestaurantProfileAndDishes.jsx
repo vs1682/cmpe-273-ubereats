@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import _ from 'lodash';
@@ -7,6 +7,15 @@ import {Grid, Cell} from 'baseui/layout-grid';
 import { useStyletron } from 'baseui';
 import { Spinner } from "baseui/spinner";
 import { useSnackbar } from 'baseui/snackbar';
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  SIZE,
+  ROLE,
+  ModalFooter,
+  ModalButton
+} from 'baseui/modal';
 
 import { fetchRestaurant } from '../../store/thunks/restaurant';
 import { fetchAllDishes, fetchDishCategories } from '../../store/thunks/dish';
@@ -18,9 +27,10 @@ import DishCard from '../../Molecule/DishCard';
 const RestaurantProfileAndDishes = () => {
   const dispatch = useDispatch();
   const [css] = useStyletron();
-  const { items, addItem, getItem, updateItemQuantity } = useCart();
+  const { emptyCart, items, addItem, getItem, updateItemQuantity } = useCart();
   const { id: restaurantId } = useParams();
-  const { enqueue } = useSnackbar();
+  const [itemToBeAdded, setItemToBeAdded] = useState(null);
+  const [differentRestaurants, setDifferentRestaurants] = useState(false);
   const restaurant = useSelector(state => state.restaurant.selected || {});
   const dishes = useSelector(state => state.dish.all);
   const categories = useSelector(state => state.dish.categories);
@@ -39,6 +49,18 @@ const RestaurantProfileAndDishes = () => {
     }
   }, [categories.length, restaurant]);
 
+  const proceedForDifferentRestaurant = () => {
+    emptyCart();
+    addItem(itemToBeAdded);
+    setItemToBeAdded(null);
+    setDifferentRestaurants(false);
+  }
+
+  const onCloseDifferentRestModal = () => {
+    setDifferentRestaurants(false);
+    setItemToBeAdded(null);
+  }
+
   const renderDish = (d) => {
     const item = getItem(d.id);
     let onAddItem = () => {
@@ -47,7 +69,8 @@ const RestaurantProfileAndDishes = () => {
         const alreadyAddedRestaurantId = item.restId;
 
         if (alreadyAddedRestaurantId != restaurant.credId) {
-          enqueue({ message: 'You cannot add dishes from different restaurants' });
+          setItemToBeAdded(d);
+          setDifferentRestaurants(true);
           return;
         }
       }
@@ -86,6 +109,42 @@ const RestaurantProfileAndDishes = () => {
           {dishes.map(renderDish)}
         </Centered>
       </Centered>
+    );
+  }
+
+  const renderDifferentRestaurantConfirmation = () => {
+    return (
+      <Modal
+        isOpen={differentRestaurants}
+        onClose={onCloseDifferentRestModal}
+        closeable
+        animate
+        autoFocus
+        size={SIZE.default}
+        role={ROLE.dialog}
+        // overrides={{
+        //   Dialog: {
+        //     style: {
+        //       width: '40vw',
+        //       // height: '80vh',
+        //       display: 'flex',
+        //       flexDirection: 'column',
+        //     },
+        //   }
+        // }}
+      >
+        <ModalHeader>Different Restaurant</ModalHeader>
+        <ModalBody>
+          <div>You already have items in your cart from a different restaurant</div>
+          <div>Do you want to proceed?</div>
+        </ModalBody>
+        <ModalFooter>
+          <ModalButton kind="tertiary" onClick={onCloseDifferentRestModal}>
+            Cancel
+          </ModalButton>
+          <ModalButton onClick={proceedForDifferentRestaurant}>Proceed</ModalButton>
+        </ModalFooter>
+      </Modal>
     );
   }
 
@@ -147,6 +206,7 @@ const RestaurantProfileAndDishes = () => {
             </div>
           </Centered>
           {_.entries(dishesDetails).map(renderDishSection)}
+          {renderDifferentRestaurantConfirmation()}
         </>
       )}
     </>

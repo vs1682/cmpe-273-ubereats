@@ -29,6 +29,11 @@ Creds.find = (creds) => {
           resolve([err, null]);
           return;
         }
+
+        if (!result.length) {
+          resolve([{ message: 'User Not Found' }, null]);
+          return;
+        }
     
         resolve([null, result[0]]);
      }

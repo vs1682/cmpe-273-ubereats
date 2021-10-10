@@ -18,6 +18,7 @@ import {
   fetchDishCategories,
   fetchDishTypes
 } from '../../store/thunks/dish';
+import { removeDish } from '../../store/slices/dish';
 
 const Dishes = () => {
   const [css] = useStyletron();
@@ -43,10 +44,10 @@ const Dishes = () => {
     dispatch(deleteDishes({ restId: restaurant.credId, ids: checkedDishes }));
   }
 
-  useEffect(() => {
-    dispatch(fetchDishCategories());
-    dispatch(fetchDishTypes());
-  }, [])
+  // useEffect(() => {
+  //   dispatch(fetchDishCategories());
+  //   dispatch(fetchDishTypes());
+  // }, [])
 
   useEffect(() => {
     if (categories.length) {
@@ -76,6 +77,7 @@ const Dishes = () => {
 
               setAllowDelete(!allowDelete);
             } else {
+              dispatch(removeDish());
               setOpenDishModalFor('NEW');
             }
           }}
@@ -127,7 +129,10 @@ const Dishes = () => {
         <DishFormModal
           dishId={openDishModalFor}
           isOpen={!!openDishModalFor}
-          onClose={() => setOpenDishModalFor(null)}
+          onClose={() => {
+            dispatch(removeDish());
+            setOpenDishModalFor(null);
+          }}
           onSubmitForm={() => {}}
         />
       )}

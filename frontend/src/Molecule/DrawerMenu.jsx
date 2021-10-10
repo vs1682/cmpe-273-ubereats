@@ -18,7 +18,7 @@ const MenuItem = styled('div', {
   fontWeight: '500'
 });
 
-const AccountMenuItem = ({ name }) => {
+const AccountMenuItem = ({ name, profilePicUrl }) => {
   const [css] = useStyletron();
 
   return (
@@ -26,7 +26,7 @@ const AccountMenuItem = ({ name }) => {
       <Avatar
         name={name}
         size="scale1600"
-        src="https://avatars.dicebear.com/api/human/yard.svg?width=285&mood=happy"
+        src={profilePicUrl}
       />
       <Space horizontal />
       <div>
@@ -45,7 +45,8 @@ const AccountMenuItem = ({ name }) => {
 const DrawerMenu = ({
   isOpen,
   onClose,
-  userName
+  userName,
+  profilePicUrl
 }) => {
   return (
     <Drawer
@@ -54,7 +55,7 @@ const DrawerMenu = ({
       size="auto"
       anchor={ANCHOR.left}
     >
-      <AccountMenuItem name={userName} />
+      <AccountMenuItem name={userName} profilePicUrl={profilePicUrl} />
       <MenuItem>
         <img src={orderIcon} width="24px" height="24px" alt="order icon" />
         <Space horizontal size={2} />

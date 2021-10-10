@@ -11,7 +11,7 @@ const Operator = styled('div', {
   height: '32px',
   borderRadius: '50%',
   backgroundColor: '#ebebeb',
-  cursor: 'pointer'
+  cursor: 'pointer',
 });
 
 const AdderRemover = ({ quantity = 0, onAdd, onRemove }) => {
@@ -23,13 +23,15 @@ const AdderRemover = ({ quantity = 0, onAdd, onRemove }) => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: '72px'
+        width: '80px'
       })}
     >
       <Operator onClick={onRemove}>
         <CheckIndeterminate />
       </Operator>
+      <div className={css({ margin: '0 4px' })}>
       {quantity}
+      </div>
       <Operator onClick={onAdd}>
         <Plus />
       </Operator>
