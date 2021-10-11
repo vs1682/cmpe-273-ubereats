@@ -22,9 +22,20 @@ describe('Credential API Routes', function() {
   });
 
   describe('POST /api/creds/sign-up', function() {
-    it('sign up customer', function(done) {
-      const body = { email: 'test5@ue.com', pwd: 'aws@12', accountRole: 'CUSTOMER', fullname: 'Test User One' };
-      const bodyWithoutPwd = { email: 'test5@ue.com', accountRole: 'CUSTOMER', fullname: 'Test User One' };
+    it('sign up restaurant', function(done) {
+      const body = {
+        email: 'testrest1@ue.com',
+        pwd: 'aws@12',
+        accountRole: 'RESTAURANT',
+        fullname: 'Test Restaurant One',
+        location: 'San Mateo'
+      };
+      const bodyWithoutPwd = {
+        email: 'testrest1@ue.com',
+        accountRole: 'RESTAURANT',
+        name: 'Test Restaurant One',
+        location: 'San Mateo'
+      };
       request.post('/api/creds/sign-up')
         .send(body)
         .expect(200)

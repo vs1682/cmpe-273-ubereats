@@ -42,8 +42,6 @@ CredsService.find = async (query) => {
 
   let [err, data] = await Creds.find(creds);
 
-  console.log('-----DATA----', err, data)
-
   if (err) {
     return [err, data];
   }
