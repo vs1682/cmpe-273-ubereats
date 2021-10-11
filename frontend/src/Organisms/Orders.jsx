@@ -1,11 +1,12 @@
 import { useStyletron } from 'baseui';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Divider from '../Atoms/Divider';
 import Space from '../Atoms/Space';
 
 import OrderItem from '../Molecule/OrderItem';
 import OrderFilter from '../Molecule/OrderFilter';
+import OrderReceipt from '../Molecule/OrderReceipt';
 
 import {
   fetchOrderByCustomer,
@@ -18,6 +19,7 @@ import { USER_TYPE } from '../utils/constants';
 const Orders = () => {
   const dispatch = useDispatch();
   const [css] = useStyletron();
+  const [receiptForOrder, setReceiptForOrder] = useState(null);
   const user = useSelector(state => state.user);
   const orders = useSelector(state => state.order.all);
   const orderFilters = useSelector(state => state.filters.order);
@@ -55,6 +57,11 @@ const Orders = () => {
         order={restDetails}
         restaurant={restaurant}
         dishes={dishes}
+        onClickViewReceipt={() => setReceiptForOrder({
+          order: restDetails,
+          restaurant,
+          dishes
+        })}
       />
       <Space/>
       <Divider size={1} />
@@ -62,7 +69,8 @@ const Orders = () => {
     </>
   )
 
-  const renderOrderItems = user.accountRole === USER_TYPE.customer
+  const isCustomer = user.accountRole === USER_TYPE.customer;
+  const renderOrderItems = isCustomer
     ? renderOrderItemsForCustomer
     : renderOrderItemsForRestaurant;
 
@@ -82,6 +90,12 @@ const Orders = () => {
         </div>
       </div>
       {orders.map(renderOrderItems)}
+      {isCustomer && receiptForOrder && (
+        <OrderReceipt
+          {...receiptForOrder}
+          onClose={() => setReceiptForOrder(null)}
+        />
+      )}
     </div>
   );
 }

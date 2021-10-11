@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import _ from 'lodash';
 import { useStyletron } from 'baseui';
+import { StyledLink } from "baseui/link";
 
 import Centered from '../Atoms/Centered';
 import Space from '../Atoms/Space';
@@ -15,7 +16,8 @@ const OrderItem = ({
   restaurant,
   customer,
   order,
-  dishes
+  dishes,
+  onClickViewReceipt
 }) => {
   const dispatch = useDispatch();
   const [css] = useStyletron();
@@ -57,8 +59,21 @@ const OrderItem = ({
       </div>
       <div className={css({ flex: 2, margin: '0 32px 0 32px' })}>
         <h3>{name}</h3>
-        <div className={css({ marginTop: '-12px', color: '#545454' })}>
+        <div className={css({ marginTop: '-12px', color: '#545454', fontSize: '15px', })}>
           {`${dishes.length} items for $${_.round(order.amount, 2)} - ${order.orderedAt}`}
+          {restaurant && (
+            <span
+              className={css({
+                textDecoration: 'underline',
+                color: 'black',
+                marginLeft: '16px',
+                fontWeight: 700
+              })}
+              onClick={onClickViewReceipt}
+            >
+              View Receipt
+            </span>
+          )}
         </div>
         <Space size={2} />
         {dishes.map(renderDishItem)}
