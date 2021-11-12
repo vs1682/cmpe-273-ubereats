@@ -1,4 +1,22 @@
-import db from './db.js';
+import mongoose from 'mongoose';
+import _ from 'lodash';
+// import db from './db.js';
+const Schema = mongoose.Schema;
+
+const CustomerSchema = new Schema({
+  credId: {type: Schema.Types.ObjectId, ref: 'Creds', required: true},
+  fullname: {type: String, required: true},
+  dob: Date,
+  city: Number,
+  state: String,
+  country: Number,
+  nickname: String,
+  phone: String,
+  profilePicUrl: String,
+  about: String,
+});
+
+const CustomerModel = mongoose.model('Customer', CustomerSchema);
 
 const Customer = function(customer) {
   this.credId = customer.credId;
@@ -13,10 +31,25 @@ const Customer = function(customer) {
   this.about = customer.about;
 };
 
+const CustomerFavoriteSchema = mongoose.Schema({
+  custId: {type: Schema.Types.ObjectId, ref: 'Customer', required: true},
+  restId: {type: Schema.Types.ObjectId, ref: 'Restaurant', required: true},
+});
+
+const CustomerFavoriteModel = mongoose.model('CustomerFavorite', CustomerFavoriteSchema);
+
 const CustomerFavorite = function(favorite) {
   this.custId = favorite.custId;
   this.restId = favorite.restId;
 }
+
+const CustomerAddressSchema = mongoose.Schema({
+  _id: Schema.Types.ObjectId,
+  custId: {type: Schema.Types.ObjectId, ref: 'Customer', required: true},
+  address: String,
+});
+
+const CustomerAddressModel = mongoose.model('CustomerAddress', CustomerAddressSchema);
 
 const CustomerAddress = function(addressDetails) {
   this.id = addressDetails.id;
@@ -26,124 +59,126 @@ const CustomerAddress = function(addressDetails) {
 
 Customer.create = (customer) => {
   return new Promise(resolve => {
-    db.query("insert into custProfile SET ?", customer, (err, result) => {
+    CustomerModel.create(customer, (err, result) => {
       if (err) {
         resolve([err, null]);
         return;
       }
   
-      resolve([null, { id: result.insertId, ...customer }]);
+      resolve([null, {...customer, _id: result._id }]);
     });
   });
 }
 
 Customer.find = (customer) => {
   return new Promise(resolve => {
-    db.query(
-      'select cp.*, c.email from custProfile cp join creds c on cp.credId = c.id where cp.credId=?',
-      [customer.credId],
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result[0]]);
+    CustomerModel.aggregate()
+    .match({credId: mongoose.Types.ObjectId(customer.credId)})
+    .lookup({
+      from: 'creds',
+      localField: 'credId',
+      foreignField: '_id',
+      as: 'credentials'
+    })
+    .unwind('credentials')
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, {..._.omit(result[0], 'credentials'), email: result[0].credentials.email}]);
+    });
   });
 }
 
 Customer.findMultiple = (customerIds) => {
   return new Promise(resolve => {
-    db.query(
-      'select cp.*, c.email from custProfile cp join creds c on cp.credId = c.id where cp.credId in (?)',
-      [customerIds],
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    CustomerModel.aggregate()
+    .match({credId: customerIds.map(id => mongoose.Types.ObjectId(id))})
+    .lookup({
+      from: 'creds',
+      localField: 'credId',
+      foreignField: '_id',
+      as: 'credentials'
+    })
+    .unwind('credentials')
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+
+      console.log('----RESULT----', result);
+  
+      resolve([null, result]);
+    })
   });
 }
 
 Customer.update = (customer) => {
   return new Promise(resolve => {
-    db.query(
-      'update custProfile SET ? where credId=?',
-      [customer, customer.credId],
+    CustomerModel.updateOne(
+      { credId: customer.credId },
+      customer,
+      {},
       (err) => {
         if (err) {
           resolve([err, null]);
           return;
         }
-    
+
         resolve([null, customer]);
       }
-    );
+    )
   });
 }
 
 Customer.favorite = (customerFavorite) => {
   return new Promise(resolve => {
-    db.query(
-      'insert into favorite SET ?',
-      [customerFavorite],
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, { id: result.insertId, ...customerFavorite }]);
+    CustomerFavoriteModel.create(customerFavorite, (err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, {...customerFavorite, _id: result._id }]);
+    })
   });
 }
 
 Customer.findFavorites = (custId) => {
   return new Promise(resolve => {
-    db.query(
-      'select * from favorite where custId = ?',
-      [custId],
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    CustomerFavoriteModel.find({ custId }, (err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result]);
+    });
   });
 }
 
 Customer.addAddress = (address) => {
   return new Promise(resolve => {
-    db.query(
-      'insert into deliveryAddress SET ?',
-      [address],
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, { ...address, id: result.insertId }]);
+    CustomerAddressModel.create(address, (err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, { ...address, _id: result._id }]);
+    })
   });
 }
 
 Customer.findAllFavoritesById = (custId) => {
   return new Promise(resolve => {
-    db.query(
-      'select restId from favorite where custId = ?',
-      [custId],
+    CustomerFavoriteModel.find(
+      { custId },
+      'restId',
+      {},
       (err, result) => {
         if (err) {
           resolve([err, null]);
@@ -158,9 +193,10 @@ Customer.findAllFavoritesById = (custId) => {
 
 Customer.findAddress = (custId, addressId) => {
   return new Promise(resolve => {
-    db.query(
-      'select * from deliveryAddress where custId = ? and id = ?',
-      [custId, addressId],
+    CustomerAddressModel.find(
+      { custId, _id: addressId },
+      null,
+      null,
       (err, result) => {
         if (err) {
           resolve([err, null]);
@@ -169,15 +205,16 @@ Customer.findAddress = (custId, addressId) => {
     
         resolve([null, result[0]]);
       }
-    );
+    )
   });
 }
 
 Customer.findAllAddress = (custId) => {
   return new Promise(resolve => {
-    db.query(
-      'select * from deliveryAddress where custId = ?',
-      [custId],
+    CustomerAddressModel.find(
+      { custId },
+      null,
+      null,
       (err, result) => {
         if (err) {
           resolve([err, null]);
@@ -186,7 +223,7 @@ Customer.findAllAddress = (custId) => {
     
         resolve([null, result]);
       }
-    );
+    )
   });
 }
 

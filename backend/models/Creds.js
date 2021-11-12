@@ -1,4 +1,14 @@
-import db from './db.js';
+import mongoose from 'mongoose';
+
+// import db from './db.js';
+
+const CredSchema = new mongoose.Schema({
+  email: String,
+  pwd: String,
+  accountRole: String
+});
+
+const CredsModel = mongoose.model('Creds', CredSchema);
 
 const Creds = function(creds) {
   this.email = creds.email;
@@ -8,22 +18,24 @@ const Creds = function(creds) {
 
 Creds.create = (creds) => {
   return new Promise(resolve => {
-    db.query("insert into creds SET ?", creds, (err, result) => {
+    CredsModel.create(creds, (err, result) => {
       if (err) {
         resolve([err, null]);
         return;
       }
   
-      resolve([null, { id: result.insertId, ...creds }]);
+      resolve([null, { id: result._id, ...creds }]);
     });
   });
 }
 
 Creds.find = (creds) => {
   return new Promise(resolve => {
-    db.query(
-      'select * from creds where email = ? and accountRole = ?',
-      [creds.email, creds.accountRole],
+    CredsModel.find(
+      {
+        email: creds.email,
+        accountRole: creds.accountRole
+      },
       (err, result) => {
         if (err) {
           resolve([err, null]);

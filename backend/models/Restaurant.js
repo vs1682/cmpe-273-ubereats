@@ -1,4 +1,19 @@
-import db from './db.js';
+import mongoose from 'mongoose';
+// import db from './db.js';
+const Schema = mongoose.Schema;
+
+const RestaurantSchema = new Schema({
+  credId: { type: Schema.Types.ObjectId, ref: 'Creds', required: true },
+  name: { type: String, required: true },
+  location: String,
+  description: String,
+  phone: String,
+  timing: String,
+  deliveryModeAllowed: Boolean,
+  profilePicUrl: String
+});
+
+const RestaurantModel = mongoose.model('Restaurant', RestaurantSchema);
 
 const Restaurant = function(restaurant) {
   this.credId = restaurant.credId;
@@ -13,22 +28,23 @@ const Restaurant = function(restaurant) {
 
 Restaurant.create = (restaurant) => {
   return new Promise(resolve => {
-    db.query('insert into restaurantProfile SET ?', restaurant, (err, result) => {
+    RestaurantModel.create(restaurant, (err, result) => {
       if (err) {
         resolve([err, null]);
         return;
       }
   
-      resolve([null, { id: result.insertId, ...restaurant }]);
+      resolve([null, { ...restaurant, _id: result._id }]);
     });
   });
 }
 
 Restaurant.update = (restaurant) => {
   return new Promise(resolve => {
-    db.query(
-      'update restaurantProfile SET ? where credId=?',
-      [restaurant, restaurant.credId],
+    RestaurantModel.updateOne(
+      { credId: restaurant.credId },
+      restaurant,
+      {},
       (err) => {
         if (err) {
           resolve([err, null]);
@@ -37,78 +53,73 @@ Restaurant.update = (restaurant) => {
     
         resolve([null, restaurant]);
       }
-    );
+    )
   });
 }
 
 Restaurant.find = (restaurant) => {
   return new Promise(resolve => {
-    db.query(
-      'select * from restaurantProfile where credId=?',
-      restaurant.credId,
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result[0]]);
+    RestaurantModel.findOne({ credId: restaurant.credId })
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result]);
+    });
   });
 }
 
 Restaurant.findMultiple = (restIds) => {
   return new Promise(resolve => {
-    db.query(
-      'select * from restaurantProfile where credId in (?)',
-      [restIds],
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    RestaurantModel.find({credId: restIds})
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result]);
+    });
   });
 }
 
 Restaurant.findAll = (filters) => {
   return new Promise(resolve => {
-    let sqlQuery =  'select * from restaurantProfile';
-    let values = [];
-    let addConnectors = false;
+    let match = {};
+    // let sqlQuery =  'select * from restaurantProfile';
+    // let values = [];
+    // let addConnectors = false;
 
     if (filters) {
       if (filters.deliveryMode) {
-        sqlQuery += ' where deliveryModeAllowed = ?';
-        values.push(1);
-        addConnectors = true;
+        match.deliveryModeAllowed = true;
+        // sqlQuery += ' where deliveryModeAllowed = ?';
+        // values.push(1);
+        // addConnectors = true;
       }
   
       if (filters.searchText) {
-        const connectingText = addConnectors ? ' and' : ' where';
-        sqlQuery += `${connectingText} (name like '%${filters.searchText}%' or location like '%${filters.searchText}%')`;
+        match.name = new RegExp(filters.searchText,'i');
+        match.location = new RegExp(filters.searchText,'i');
+        // const connectingText = addConnectors ? ' and' : ' where';
+        // sqlQuery += `${connectingText} (name like '%${filters.searchText}%' or location like '%${filters.searchText}%')`;
       }
     }
 
     console.log('---SQL FILTERS----', filters)
-    console.log('---SQL----', sqlQuery)
+    console.log('---SQL----', match)
 
-    db.query(
-      sqlQuery,
-      values,
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    RestaurantModel.find(match)
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result]);
+    });
   });
 }
 

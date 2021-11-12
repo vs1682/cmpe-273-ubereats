@@ -1,4 +1,34 @@
-import db from './db.js';
+import mongoose from 'mongoose';
+import _ from 'lodash';
+// import db from './db.js';
+const Schema = mongoose.Schema;
+
+const DishSchema = new Schema({
+  restId: {type: Schema.Types.ObjectId, ref: 'Restaurant', required: true},
+  name: { type: String, required: true},
+  ingredients: String,
+  imageId: {type: Schema.Types.ObjectId, ref: 'Image'},
+  price: Number,
+  description: String,
+  category: {type: Schema.Types.ObjectId, ref: 'DishCategory'},
+  type: {type: Schema.Types.ObjectId, ref: 'DishType'},
+});
+
+const DishModel = mongoose.model('Dish', DishSchema);
+
+const DishCategorySchema = new Schema({
+  _id: {type: Schema.Types.ObjectId, required: true},
+  name: {type: String, required: true}
+});
+
+const DishCategoryModel = mongoose.model('DishCategory', DishCategorySchema);
+
+const DishTypeSchema = new Schema({
+  _id: {type: Schema.Types.ObjectId, required: true},
+  name: {type: String, required: true}
+});
+
+const DishTypeModel = mongoose.model('DishType', DishTypeSchema);
 
 const Dish = function(dish) {
   this.id = dish.id
@@ -14,22 +44,23 @@ const Dish = function(dish) {
 
 Dish.create = (dish) => {
   return new Promise(resolve => {
-    db.query('insert into dish SET ?', dish, (err, result) => {
+    DishModel.create(dish, (err, result) => {
       if (err) {
         resolve([err, null]);
         return;
       }
   
-      resolve([null, { ...dish, id: result.insertId }]);
+      resolve([null, { ...dish, _id: result._id }]);
     });
   });
 }
 
 Dish.update = (dish) => {
   return new Promise(resolve => {
-    db.query(
-      'update dish SET ? where id=? and restId=?',
-      [dish, dish.id, dish.restId],
+    DishModel.updateOne(
+      { _id: dish.id, restId: dish.restId },
+      dish,
+      {},
       (err) => {
         if (err) {
           resolve([err, null]);
@@ -44,103 +75,150 @@ Dish.update = (dish) => {
 
 Dish.find = (restId, id) => {
   return new Promise(resolve => {
-    db.query(
-      'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id where d.id=? and d.restId=?',
-      [id, restId],
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result[0]]);
+    DishModel.aggregate()
+    .match({
+      restId: mongoose.Types.ObjectId(restId),
+      _id: mongoose.Types.ObjectId(id)
+    })
+    .lookup({
+      from: 'image',
+      localField: 'imageId',
+      foreignField: '_id',
+      as: 'image'
+    })
+    .unwind('image')
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, {..._.omit(result[0], 'image'), imageUrl: result[0].image.url}]);
+    });
   });
 }
 
 Dish.findMultiple = (restId, dishIds) => {
   return new Promise(resolve => {
-    db.query(
-      'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id where restId=? and d.id in (?)',
-      [restId, dishIds],
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    DishModel.aggregate()
+    .match({
+      restId: mongoose.Types.ObjectId(restId),
+      _id: dishIds.map(id => mongoose.Types.ObjectId(id))
+    })
+    .lookup({
+      from: 'image',
+      localField: 'imageId',
+      foreignField: '_id',
+      as: 'image'
+    })
+    .unwind('image')
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result]);
+    });
   });
 }
 
 Dish.findMultipleRestaurantDishes = (restIds, dishIds) => {
   return new Promise(resolve => {
-    db.query(
-      'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id where restId in (?) and d.id in (?)',
-      [restIds, dishIds],
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    DishModel.aggregate()
+    .match({
+      restId: restIds.map(id => mongoose.Types.ObjectId(id)),
+      _id: dishIds.map(id => mongoose.Types.ObjectId(id))
+    })
+    .lookup({
+      from: 'image',
+      localField: 'imageId',
+      foreignField: '_id',
+      as: 'image'
+    })
+    .unwind('image')
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result]);
+    });
   });
 }
 
 Dish.findAll = (restId, filters) => {
-  let sqlQuery = 'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id';
-  let values = [];
-  let addConnectors = false;
+  // let sqlQuery = 'select d.*, i.url as imageUrl from dish d left join image i on d.imageId = i.id';
+  // let values = [];
+  // let addConnectors = false;
+
+  let match = {};
 
   if (restId) {
-    sqlQuery += ' where restId = ?';
-    values.push(restId);
-    addConnectors = true;
+    match.restId = mongoose.Types.ObjectId(restId);
+    // sqlQuery += ' where restId = ?';
+    // values.push(restId);
+    // addConnectors = true;
   }
 
   if (filters) {
     if (filters.types) {
-      const connectingText = addConnectors ? ' and' : ' where';
-      sqlQuery += connectingText + ' type in (?)';
-      values.push(filters.types);
-      addConnectors = true;
+      match.type = filters.types;
+      // const connectingText = addConnectors ? ' and' : ' where';
+      // sqlQuery += connectingText + ' type in (?)';
+      // values.push(filters.types);
+      // addConnectors = true;
     }
 
     if (filters.searchText) {
-      const connectingText = addConnectors ? ' and' : ' where';
-      sqlQuery += `${connectingText} (name like '%${filters.searchText}%')`;
+      match.name = new RegExp(filters.searchText,'i');
+      // const connectingText = addConnectors ? ' and' : ' where';
+      // sqlQuery += `${connectingText} (name like '%${filters.searchText}%')`;
     }
   }
 
-  console.log('---SQL----', sqlQuery)
+  console.log('---SQL----', match)
 
   return new Promise(resolve => {
-    db.query(
-      sqlQuery,
-      values,
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    DishModel.aggregate()
+    .match(match)
+    .lookup({
+      from: 'images',
+      localField: 'imageId',
+      foreignField: '_id',
+      as: 'image'
+    })
+    .unwind({ path: '$image', preserveNullAndEmptyArrays: true })
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+
+      result = result.map(r => {
+        if (r.image) {
+          r.imageUrl = r.image.url;
+        }
+        
+        _.omit(r, 'image');
+
+        return r;
+      });
+  
+      resolve([null, result]);
+    });
   });
 }
 
 Dish.delete = (restId, ids) => {
   return new Promise(resolve => {
-    db.query(
-      'delete from dish where restId=? and id=?',
-      [restId, ids],
+    DishModel.deleteOne(
+      {
+        restId,
+        _id: ids
+      },
+      {},
       (err, result) => {
         if (err) {
           resolve([err, null]);
@@ -155,16 +233,19 @@ Dish.delete = (restId, ids) => {
 
 Dish.deleteMultiple = (restId, ids) => {
   return new Promise(resolve => {
-    db.query(
-      'delete from dish where restId=? and id in (?)',
-      [restId, ids],
+    DishModel.deleteOne(
+      {
+        restId,
+        _id: ids
+      },
+      {},
       (err, result) => {
         if (err) {
           resolve([err, null]);
           return;
         }
     
-        resolve([null, result[0]]);
+        resolve([null, result]);
       }
     );
   });
@@ -172,33 +253,29 @@ Dish.deleteMultiple = (restId, ids) => {
 
 Dish.getCategories = () => {
   return new Promise(resolve => {
-    db.query(
-      'select * from dishCategory',
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    DishCategoryModel.find()
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result]);
+    });
   });
 }
 
 Dish.getTypes = () => {
   return new Promise(resolve => {
-    db.query(
-      'select * from dishType',
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    DishTypeModel.find()
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result]);
+    });
   });
 }
 

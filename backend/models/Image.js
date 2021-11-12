@@ -1,37 +1,44 @@
-import db from './db.js';
+import mongoose from 'mongoose';
+// import db from './db.js';
+const Schema = mongoose.Schema;
+
+const ImageSchema = new Schema({
+  url: { type: String, required: true }
+});
+
+const ImageModel = mongoose.model('Image', ImageSchema);
 
 const Image = function(image) {
-  this.id = image.id
+  this._id = image._id
   this.url = image.url
 };
 
 Image.create = (image) => {
   return new Promise(resolve => {
-    db.query('insert into image SET ?', image, (err, result) => {
+    ImageModel.create(image, (err, result) => {
       if (err) {
         resolve([err, null]);
         return;
       }
+
+      console.log('---IMAGE DATA---', result, image);
   
-      resolve([null, { ...image, id: result.insertId }]);
+      resolve([null, { ...image, _id: result._id }]);
     });
   });
 }
 
 Image.find = (image) => {
   return new Promise(resolve => {
-    db.query(
-      'select * from image where id=?',
-      [image.id],
-      (err) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, image]);
+    ImageModel.find({ _id: image.id })
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result[0]]);
+    })
   });
 }
 

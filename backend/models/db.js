@@ -1,21 +1,20 @@
-import mysql from 'mysql';
+import mongoose from 'mongoose';
 import 'dotenv/config';
 
-const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
+const { DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
 
 // Create a connection to the database
-const connection = mysql.createConnection({
-  host: DB_HOST,
-  port: DB_PORT,
-  user: DB_USERNAME,
-  password: DB_PASSWORD,
-  database: DB_DATABASE
-});
+const connectToMongo = async () => {
+  const connectionStr = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@cluster0.zpvyv.mongodb.net/${DB_DATABASE}?retryWrites=true&w=majority`;
+  await mongoose.connect(connectionStr);
+  console.log("Successfully connected to the database.");
+}
 
 // open the MySQL connection
-connection.connect(error => {
-  if (error) throw error;
-  console.log("Successfully connected to the database.");
-});
+// connection.connect(error => {
+//   if (error) throw error;
+//   console.log("Successfully connected to the database.");
+// });
+connectToMongo();
 
-export default connection;
+export default {};
