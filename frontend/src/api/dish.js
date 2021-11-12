@@ -1,4 +1,5 @@
 import { API_URL } from '../utils/constants';
+import { changeIdKey } from '../utils/helper';
 
 const DishApi = {};
 
@@ -10,7 +11,7 @@ DishApi.getCategories = async () => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 DishApi.getTypes = async () => {
@@ -21,7 +22,7 @@ DishApi.getTypes = async () => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 DishApi.getAll = async (restId) => {
@@ -32,7 +33,7 @@ DishApi.getAll = async (restId) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 DishApi.getDish = async (restId, id) => {
@@ -43,7 +44,7 @@ DishApi.getDish = async (restId, id) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 DishApi.create = async (data) => {
@@ -55,7 +56,7 @@ DishApi.create = async (data) => {
     body: JSON.stringify(data)
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 DishApi.update = async (data) => {
@@ -67,7 +68,7 @@ DishApi.update = async (data) => {
     body: JSON.stringify(data)
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 DishApi.deleteMultiple = async (restId, ids) => {

@@ -1,4 +1,5 @@
 import { API_URL } from '../utils/constants';
+import { changeIdKey } from '../utils/helper';
 
 const CustomerApi = {};
 
@@ -10,7 +11,7 @@ CustomerApi.getProfile = async (id) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CustomerApi.updateProfile = async (data) => {
@@ -22,7 +23,7 @@ CustomerApi.updateProfile = async (data) => {
     body: JSON.stringify(data)
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CustomerApi.addFavorite = async (data) => {
@@ -34,7 +35,7 @@ CustomerApi.addFavorite = async (data) => {
     body: JSON.stringify(data)
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CustomerApi.addAddress = async (data) => {
@@ -46,7 +47,7 @@ CustomerApi.addAddress = async (data) => {
     body: JSON.stringify(data)
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CustomerApi.getAddress = async ({ custId, addressId }) => {
@@ -57,7 +58,7 @@ CustomerApi.getAddress = async ({ custId, addressId }) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CustomerApi.getAllAddresses = async ({ custId }) => {
@@ -68,7 +69,7 @@ CustomerApi.getAllAddresses = async ({ custId }) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CustomerApi.fetchFavorites = async (custId) => {
@@ -79,7 +80,7 @@ CustomerApi.fetchFavorites = async (custId) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 export default CustomerApi;

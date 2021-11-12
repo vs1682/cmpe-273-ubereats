@@ -1,4 +1,5 @@
 import { API_URL } from '../utils/constants';
+import { changeIdKey } from '../utils/helper';
 
 const OrderApi = {};
 
@@ -11,7 +12,7 @@ OrderApi.create = async (data) => {
     body: JSON.stringify(data)
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 OrderApi.fetchById = async (id) => {
@@ -22,7 +23,7 @@ OrderApi.fetchById = async (id) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 OrderApi.fetchAllByCustomer = async (id, filters) => {
@@ -33,7 +34,7 @@ OrderApi.fetchAllByCustomer = async (id, filters) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 OrderApi.fetchAllByRestaurant = async (id, filters) => {
@@ -44,7 +45,7 @@ OrderApi.fetchAllByRestaurant = async (id, filters) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 OrderApi.fetchAllStatuses = async () => {
@@ -55,7 +56,7 @@ OrderApi.fetchAllStatuses = async () => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 OrderApi.updateOrderStatus = async (orderId, status) => {
@@ -66,7 +67,7 @@ OrderApi.updateOrderStatus = async (orderId, status) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 export default OrderApi;

@@ -41,4 +41,4 @@ export const URLS = {
   order: ORDER_URLS
 }
 
-export const API_URL = 'http://18.188.72.152:8000';
+export const API_URL = 'http://localhost:8000';

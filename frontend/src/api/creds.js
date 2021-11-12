@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { API_URL } from '../utils/constants';
+import { changeIdKey } from '../utils/helper';
 
 const CredApi = {};
 
@@ -13,7 +12,7 @@ CredApi.signUp = async (data) => {
     body: JSON.stringify(data)
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CredApi.signIn = async (data) => {
@@ -25,7 +24,7 @@ CredApi.signIn = async (data) => {
     body: JSON.stringify(data)
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 export default CredApi;

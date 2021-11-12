@@ -1,4 +1,5 @@
 import { API_URL } from '../utils/constants';
+import { changeIdKey } from '../utils/helper';
 
 const UploadApi = {};
 
@@ -10,7 +11,7 @@ UploadApi.getUploadUrl = async () => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 UploadApi.uploadImage = async (url, file) => {
@@ -22,7 +23,7 @@ UploadApi.uploadImage = async (url, file) => {
     body: file
   });
 
-  return response;
+  return changeIdKey(response);
 }
 
 export default UploadApi;

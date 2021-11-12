@@ -1,4 +1,5 @@
 import { API_URL } from '../utils/constants';
+import { changeIdKey } from '../utils/helper';
 
 const RestaurantApi = {};
 
@@ -10,7 +11,7 @@ RestaurantApi.getProfile = async (id) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 RestaurantApi.updateProfile = async (data) => {
@@ -22,7 +23,7 @@ RestaurantApi.updateProfile = async (data) => {
     body: JSON.stringify(data)
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 RestaurantApi.getAll = async (customerId, filters) => {
@@ -40,7 +41,7 @@ RestaurantApi.getAll = async (customerId, filters) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 export default RestaurantApi;

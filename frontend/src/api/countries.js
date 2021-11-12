@@ -1,4 +1,5 @@
 import { API_URL } from '../utils/constants';
+import { changeIdKey } from '../utils/helper';
 
 const CountriesApi = {};
 
@@ -10,7 +11,7 @@ CountriesApi.getCountries = async () => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CountriesApi.getStates = async (country) => {
@@ -21,7 +22,7 @@ CountriesApi.getStates = async (country) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CountriesApi.getCities = async (country, state) => {
@@ -32,7 +33,7 @@ CountriesApi.getCities = async (country, state) => {
     }
   });
 
-  return response.json();
+  return changeIdKey(await response.json());
 }
 
 CountriesApi.getDetails = async (country, state, city) => {
@@ -56,7 +57,7 @@ CountriesApi.getDetails = async (country, state, city) => {
       }
     });
 
-    return response.json();
+    return changeIdKey(await response.json());
   }
 
   return {};
