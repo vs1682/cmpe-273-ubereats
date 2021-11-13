@@ -11,9 +11,7 @@ export const filterSlice = createSlice({
       searchText: '',
       types: []
     },
-    order: {
-      status: 1
-    }
+    order: {}
   },
   reducers: {
     setRestaurantFilters: (state, action) => {
