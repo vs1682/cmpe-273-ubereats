@@ -26,12 +26,6 @@ const BoldText = styled('p', {
   fontWeight: 'bold'
 });
 
-const iconMap = {
-  1: vegIcon,
-  2: nonVegIcon,
-  3: veganIcon
-};
-
 const FoodTypeFilter = () => {
   const dispatch = useDispatch();
   const [css] = useStyletron();
@@ -56,6 +50,22 @@ const FoodTypeFilter = () => {
       filters: {...restaurantFilters, types: newTypeFilters}
     }));
   }
+
+  const getIconMap = () => {
+    if (!dishTypes || dishTypes.length == 0) {
+      return {};
+    }
+
+    const dishTypesMap = _.keyBy(dishTypes, 'name');
+
+    return {
+      [dishTypesMap['Veg'].id]: vegIcon,
+      [dishTypesMap['Non-Veg'].id]: nonVegIcon,
+      [dishTypesMap['Vegan'].id]: veganIcon
+    };
+  }
+
+  const iconMap = getIconMap();
 
   return (
     <ul className={css({ padding: '16px', borderBottom: '1px solid rgb(226, 226, 226)' })}>
