@@ -17,6 +17,7 @@ OrderController.create = async (req, res) => {
       message:
         err.message || "Some error occurred while creating the Order."
     });
+    return;
   }
 
   res.json(data);
@@ -49,8 +50,8 @@ OrderController.updateOrderStatus = async (req, res) => {
   }
 
   const [err, data] = await OrderService.updateOrderStatus({
-    orderId: parseInt(req.params.id),
-    status: parseInt(req.params.status)
+    orderId: req.params.id,
+    status: req.params.status
   });
 
   if (err) {
