@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 
+import './models/db.js';
 // import authenticateTokenMiddleware from './middlewares/authentication.js';
 import credsRoutes from './routes/creds.js';
 import restaurantRoutes from './routes/restaurant.js';
