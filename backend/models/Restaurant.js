@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
+import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 // import db from './db.js';
 const Schema = mongoose.Schema;
 
+const schemaOptions = { toJSON: { virtuals: true } };
 const RestaurantSchema = new Schema({
   credId: { type: Schema.Types.ObjectId, ref: 'Creds', required: true },
   name: { type: String, required: true },
@@ -11,7 +13,13 @@ const RestaurantSchema = new Schema({
   timing: String,
   deliveryModeAllowed: Boolean,
   profilePicUrl: String
+}, schemaOptions);
+
+RestaurantSchema.virtual('id').get(function() {
+  return this._id.toString();
 });
+
+RestaurantSchema.plugin(mongooseLeanVirtuals);
 
 const RestaurantModel = mongoose.model('Restaurant', RestaurantSchema);
 
@@ -34,7 +42,7 @@ Restaurant.create = (restaurant) => {
         return;
       }
   
-      resolve([null, { ...restaurant, _id: result._id }]);
+      resolve([null, { ...restaurant, id: result._id }]);
     });
   });
 }
@@ -43,23 +51,24 @@ Restaurant.update = (restaurant) => {
   return new Promise(resolve => {
     RestaurantModel.updateOne(
       { credId: restaurant.credId },
-      restaurant,
-      {},
-      (err) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, restaurant]);
-      }
+      restaurant
     )
+    .lean({ virtuals: true })
+    .exec((err) => {
+      if (err) {
+        resolve([err, null]);
+        return;
+      }
+  
+      resolve([null, restaurant]);
+    });
   });
 }
 
 Restaurant.find = (restaurant) => {
   return new Promise(resolve => {
     RestaurantModel.findOne({ credId: restaurant.credId })
+    .lean({ virtuals: true })
     .exec((err, result) => {
       if (err) {
         resolve([err, null]);
@@ -74,6 +83,7 @@ Restaurant.find = (restaurant) => {
 Restaurant.findMultiple = (restIds) => {
   return new Promise(resolve => {
     RestaurantModel.find({credId: restIds})
+    .lean({ virtuals: true })
     .exec((err, result) => {
       if (err) {
         resolve([err, null]);
@@ -112,6 +122,7 @@ Restaurant.findAll = (filters) => {
     console.log('---SQL----', match)
 
     RestaurantModel.find(match)
+    .lean({ virtuals: true })
     .exec((err, result) => {
       if (err) {
         resolve([err, null]);

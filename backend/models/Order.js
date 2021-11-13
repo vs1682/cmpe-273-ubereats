@@ -1,4 +1,26 @@
-import db from './db.js';
+import mongoose from 'mongoose';
+import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
+// import _ from 'lodash';
+// import db from './db.js';
+const Schema = mongoose.Schema;
+
+const schemaOptions = { toJSON: { virtuals: true } };
+const OrderSchema = new Schema({
+  custId: {type: Schema.Types.ObjectId, ref: 'Customer', required: true},
+  restId: {type: Schema.Types.ObjectId, ref: 'Restaurant', required: true},
+  amount: Number,
+  deliveryMode: Boolean,
+  orderedAt: Date,
+  status: {type: Schema.Types.ObjectId, ref: 'OrderStatus'}
+}, schemaOptions);
+
+OrderSchema.virtual('orderId').get(function() {
+  return this._id.toString();
+});
+
+OrderSchema.plugin(mongooseLeanVirtuals);
+
+const OrderModel = mongoose.model('Order', OrderSchema);
 
 const Order = function(order) {
   this.orderId = order.orderId;
@@ -10,41 +32,66 @@ const Order = function(order) {
   this.status = order.status;
 };
 
+const OrderItemSchema = new Schema({
+  orderId: {type: Schema.Types.ObjectId, ref: 'Order', required: true},
+  dishId: {type: Schema.Types.ObjectId, ref: 'Dish', required: true},
+  quantity: {type: Number, required: true}
+}, schemaOptions);
+
+const OrderItemModel = mongoose.model('OrderItem', OrderItemSchema);
+
 const OrderItem = function(order) {
   this.orderId = order.orderId;
   this.dishId = order.dishId;
   this.quantity = order.quantity
 };
 
+const OrderStatusSchema = new Schema({
+  name: {type: String, required: true}
+});
+
+OrderStatusSchema.virtual('id').get(function() {
+  return this._id.toString();
+});
+
+OrderStatusSchema.plugin(mongooseLeanVirtuals);
+
+const OrderStatusModel = mongoose.model('OrderStatus', OrderStatusSchema);
+
 Order.create = (order) => {
   return new Promise(resolve => {
-    db.query("insert into orders SET ?", order, (err, result) => {
+    OrderModel.create(order, (err, result) => {
       if (err) {
         resolve([err, null]);
         return;
       }
   
-      resolve([null, { ...order, orderId: result.insertId }]);
+      resolve([null, { ...order, orderId: result._id }]);
     });
   });
 }
 
 Order.updateOrderStatus = (order) => {
   return new Promise(resolve => {
-    db.query("update orders SET status = ? where orderId = ?", [order.status, order.orderId], (err) => {
+    OrderModel.updateOne(
+      { _id: order.orderId },
+      { status: order.status }
+    )
+    .lean({ virtuals: true })
+    .exec((err) => {
       if (err) {
         resolve([err, null]);
         return;
       }
   
       resolve([null, { ...order }]);
-    });
+    })
   });
 }
 
 Order.insertOrderItems = (orderItems) => {
   return new Promise(resolve => {
-    db.query("insert into orderItem (orderId, dishId, quantity) VALUES ?", [orderItems], (err) => {
+    OrderItemModel.create(orderItems, (err) => {
       if (err) {
         resolve([err, null]);
         return;
@@ -57,20 +104,24 @@ Order.insertOrderItems = (orderItems) => {
 
 Order.findById = (orderId) => {
   return new Promise(resolve => {
-    db.query("select * from orders where orderId = ?", [orderId], (err, result) => {
+    OrderModel.findById(orderId)
+    .lean({ virtuals: true })
+    .exec((err, result) => {
       if (err) {
         resolve([err, null]);
         return;
       }
   
-      resolve([null, result[0]]);
+      resolve([null, result]);
     });
   });
 }
 
 Order.findOrderItems = (orderId) => {
   return new Promise(resolve => {
-    db.query("select * from orderItem where orderId = ?", [orderId], (err, result) => {
+    OrderItemModel.find({ orderId })
+    .lean({ virtuals: true })
+    .exec((err, result) => {
       if (err) {
         resolve([err, null]);
         return;
@@ -83,7 +134,11 @@ Order.findOrderItems = (orderId) => {
 
 Order.findMultipleOrderItems = (orderIds) => {
   return new Promise(resolve => {
-    db.query("select * from orderItem where orderId in (?)", [orderIds], (err, result) => {
+    OrderItemModel.find({
+      orderId: orderIds
+    })
+    .lean({ virtuals: true })
+    .exec((err, result) => {
       if (err) {
         resolve([err, null]);
         return;
@@ -95,22 +150,28 @@ Order.findMultipleOrderItems = (orderIds) => {
 }
 
 Order.findAllByCustomer = ({ custId, filters }) => {
-  let sqlQuery = 'select * from orders where custId = ?';
-  let values = [custId];
+  // let sqlQuery = 'select * from orders where custId = ?';
+  // let values = [custId];
+  let match = { custId };
 
   if (filters) {
     if (filters.status) {
-      sqlQuery += ' and status = ?';
-      values.push(`${filters.status}`);
+      match.status = filters.status;
+      // sqlQuery += ' and status = ?';
+      // values.push(`${filters.status}`);
     }
   }
 
   return new Promise(resolve => {
-    db.query(sqlQuery, values, (err, result) => {
+    OrderModel.find(match)
+    .lean({ virtuals: true })
+    .exec((err, result) => {
       if (err) {
         resolve([err, null]);
         return;
       }
+
+      console.log('----MATCH----', match, err, result);
 
       resolve([null, result]);
     });
@@ -120,16 +181,20 @@ Order.findAllByCustomer = ({ custId, filters }) => {
 Order.findAllByRestaurant = ({ restId, filters }) => {
   let sqlQuery = 'select * from orders where restId = ?';
   let values = [restId];
+  let match = { restId };
 
   if (filters) {
     if (filters.status) {
-      sqlQuery += ' and status = ?';
-      values.push(`${filters.status}`);
+      match.status = filters.status;
+      // sqlQuery += ' and status = ?';
+      // values.push(`${filters.status}`);
     }
   }
 
   return new Promise(resolve => {
-    db.query(sqlQuery, values, (err, result) => {
+    OrderModel.find(match)
+    .lean({ virtuals: true })
+    .exec((err, result) => {
       if (err) {
         resolve([err, null]);
         return;
@@ -142,7 +207,9 @@ Order.findAllByRestaurant = ({ restId, filters }) => {
 
 Order.findAllStatuses = () => {
   return new Promise(resolve => {
-    db.query("select * from orderStatus", [], (err, result) => {
+    OrderStatusModel.find()
+    .lean({ virtuals: true })
+    .exec((err, result) => {
       if (err) {
         resolve([err, null]);
         return;

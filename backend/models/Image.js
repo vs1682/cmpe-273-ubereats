@@ -1,10 +1,17 @@
 import mongoose from 'mongoose';
+import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 // import db from './db.js';
 const Schema = mongoose.Schema;
 
 const ImageSchema = new Schema({
   url: { type: String, required: true }
 });
+
+ImageSchema.virtual('id').get(function() {
+  return this._id.toString();
+});
+
+ImageSchema.plugin(mongooseLeanVirtuals);
 
 const ImageModel = mongoose.model('Image', ImageSchema);
 
@@ -21,23 +28,22 @@ Image.create = (image) => {
         return;
       }
 
-      console.log('---IMAGE DATA---', result, image);
-  
-      resolve([null, { ...image, _id: result._id }]);
+      resolve([null, { ...image, id: result._id }]);
     });
   });
 }
 
 Image.find = (image) => {
   return new Promise(resolve => {
-    ImageModel.find({ _id: image.id })
+    ImageModel.findOne({ _id: image.id })
+    .lean({ virtuals: true })
     .exec((err, result) => {
       if (err) {
         resolve([err, null]);
         return;
       }
   
-      resolve([null, result[0]]);
+      resolve([null, result]);
     })
   });
 }

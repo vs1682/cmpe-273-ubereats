@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 
 // import db from './db.js';
 
@@ -7,6 +8,12 @@ const CredSchema = new mongoose.Schema({
   pwd: String,
   accountRole: String
 });
+
+CredSchema.virtual('id').get(function() {
+  return this._id.toString();
+});
+
+CredSchema.plugin(mongooseLeanVirtuals);
 
 const CredsModel = mongoose.model('Creds', CredSchema);
 
@@ -31,25 +38,24 @@ Creds.create = (creds) => {
 
 Creds.find = (creds) => {
   return new Promise(resolve => {
-    CredsModel.find(
-      {
-        email: creds.email,
-        accountRole: creds.accountRole
-      },
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
+    CredsModel.find({
+      email: creds.email,
+      accountRole: creds.accountRole
+    })
+    .lean({ virtuals: true })
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
+      }
 
-        if (!result.length) {
-          resolve([{ message: 'User Not Found' }, null]);
-          return;
-        }
-    
-        resolve([null, result[0]]);
-     }
-    );
+      if (!result.length) {
+        resolve([{ message: 'User Not Found' }, null]);
+        return;
+      }
+  
+      resolve([null, result[0]]);
+    });
   });
 }
 

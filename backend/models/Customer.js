@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongooseLeanVirtuals from 'mongoose-lean-virtuals';
 import _ from 'lodash';
 // import db from './db.js';
 const Schema = mongoose.Schema;
@@ -9,7 +10,7 @@ const CustomerSchema = new Schema({
   dob: Date,
   city: Number,
   state: String,
-  country: Number,
+  country: String,
   nickname: String,
   phone: String,
   profilePicUrl: String,
@@ -44,10 +45,15 @@ const CustomerFavorite = function(favorite) {
 }
 
 const CustomerAddressSchema = mongoose.Schema({
-  _id: Schema.Types.ObjectId,
   custId: {type: Schema.Types.ObjectId, ref: 'Customer', required: true},
   address: String,
 });
+
+CustomerAddressSchema.virtual('id').get(function() {
+  return this._id.toString();
+});
+
+CustomerAddressSchema.plugin(mongooseLeanVirtuals);
 
 const CustomerAddressModel = mongoose.model('CustomerAddress', CustomerAddressSchema);
 
@@ -95,7 +101,7 @@ Customer.find = (customer) => {
 Customer.findMultiple = (customerIds) => {
   return new Promise(resolve => {
     CustomerModel.aggregate()
-    .match({credId: customerIds.map(id => mongoose.Types.ObjectId(id))})
+    .match({credId: { $in: customerIds }})
     .lookup({
       from: 'creds',
       localField: 'credId',
@@ -108,8 +114,6 @@ Customer.findMultiple = (customerIds) => {
         resolve([err, null]);
         return;
       }
-
-      console.log('----RESULT----', result);
   
       resolve([null, result]);
     })
@@ -121,16 +125,16 @@ Customer.update = (customer) => {
     CustomerModel.updateOne(
       { credId: customer.credId },
       customer,
-      {},
-      (err) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-
-        resolve([null, customer]);
-      }
     )
+    .lean()
+    .exec((err) => {
+      if (err) {
+        resolve([err, null]);
+        return;
+      }
+
+      resolve([null, customer]);
+    })
   });
 }
 
@@ -149,7 +153,9 @@ Customer.favorite = (customerFavorite) => {
 
 Customer.findFavorites = (custId) => {
   return new Promise(resolve => {
-    CustomerFavoriteModel.find({ custId }, (err, result) => {
+    CustomerFavoriteModel.find({ custId })
+    .lean()
+    .exec((err, result) => {
       if (err) {
         resolve([err, null]);
         return;
@@ -168,7 +174,7 @@ Customer.addAddress = (address) => {
         return;
       }
   
-      resolve([null, { ...address, _id: result._id }]);
+      resolve([null, { ...address, id: result._id }]);
     })
   });
 }
@@ -178,52 +184,46 @@ Customer.findAllFavoritesById = (custId) => {
     CustomerFavoriteModel.find(
       { custId },
       'restId',
-      {},
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    )
+    .lean({ virtuals: true })
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    );
+  
+      resolve([null, result]);
+    });
   });
 }
 
 Customer.findAddress = (custId, addressId) => {
   return new Promise(resolve => {
-    CustomerAddressModel.find(
-      { custId, _id: addressId },
-      null,
-      null,
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result[0]]);
+    CustomerAddressModel.findOne({ custId, _id: addressId })
+    .lean({ virtuals: true })
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    )
+  
+      resolve([null, result]);
+    });
   });
 }
 
 Customer.findAllAddress = (custId) => {
   return new Promise(resolve => {
-    CustomerAddressModel.find(
-      { custId },
-      null,
-      null,
-      (err, result) => {
-        if (err) {
-          resolve([err, null]);
-          return;
-        }
-    
-        resolve([null, result]);
+    CustomerAddressModel.find({ custId })
+    .lean({ virtuals: true })
+    .exec((err, result) => {
+      if (err) {
+        resolve([err, null]);
+        return;
       }
-    )
+  
+      resolve([null, result]);
+    });
   });
 }
 
