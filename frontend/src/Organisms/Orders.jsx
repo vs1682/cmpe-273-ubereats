@@ -1,6 +1,8 @@
-import { useStyletron } from 'baseui';
 import React, { useEffect, useState } from 'react';
+import { useStyletron } from 'baseui';
 import { useDispatch, useSelector } from 'react-redux';
+import _ from 'lodash';
+
 import Divider from '../Atoms/Divider';
 import Space from '../Atoms/Space';
 
@@ -10,8 +12,7 @@ import OrderReceipt from '../Molecule/OrderReceipt';
 
 import {
   fetchOrderByCustomer,
-  fetchOrderByRestaurant,
-  fetchOrderStatuses
+  fetchOrderByRestaurant
 } from '../store/thunks/order';
 import { setOrderFilter } from '../store/slices/filters';
 import { USER_TYPE } from '../utils/constants';
@@ -25,15 +26,11 @@ const Orders = () => {
   const orderFilters = useSelector(state => state.filters.order);
 
   useEffect(() => {
-    dispatch(fetchOrderStatuses());
-  }, []);
-
-  useEffect(() => {
-    if (user.accountRole === USER_TYPE.customer) {
+    if (user.accountRole === USER_TYPE.customer && Object.keys(orderFilters).length > 0) {
       dispatch(fetchOrderByCustomer({ id: user.credId, filters: orderFilters }));
     }
 
-    if (user.accountRole === USER_TYPE.restaurant) {
+    if (user.accountRole === USER_TYPE.restaurant && Object.keys(orderFilters).length > 0) {
       dispatch(fetchOrderByRestaurant({ id: user.credId, filters: orderFilters }));
     }
   }, [orderFilters]);

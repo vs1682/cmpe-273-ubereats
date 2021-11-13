@@ -16,7 +16,7 @@ const Layout = ({ children }) => {
       <HeaderNavigation>
         <NavigationList $align={ALIGN.left}>
           <NavigationItem>
-            <a href="/restaurant/">
+            <a href="/restaurant">
               <BrandLogo height="24px" />
             </a>
           </NavigationItem>

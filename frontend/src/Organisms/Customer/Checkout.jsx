@@ -36,6 +36,7 @@ const Checkout = () => {
   const restaurant = useSelector(state => state.restaurant.selected || {});
   const allAddresses = useSelector(state => state.customer.address.all);
   const selectedAddress = useSelector(state => state.customer.address.selected);
+  const orderStatuses = useSelector(state => state.order.statuses);
 
   useEffect(() => {
     dispatch(fetchCustomerAllAddresses({ custId: user.credId }));
@@ -60,12 +61,14 @@ const Checkout = () => {
       return;
     }
 
+    const orderStatusMap = _.keyBy(orderStatuses, 'name');
+
     dispatch(createOrder({
       custId: user.credId,
       restId: restaurant.credId,
       dishes: items.map(i => ({dishId: i.id, quantity: i.quantity})),
       amount: getAmountBreakup().total,
-      status: 1,
+      status: orderStatusMap['NEW'].id,
       deliveryMode: restaurant.deliveryModeAllowed,
       orderedAt: new Date()
     }));

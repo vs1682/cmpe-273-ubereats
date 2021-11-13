@@ -60,7 +60,7 @@ const DishForm = ({
   }
 
   useEffect(() => {
-    if (isNumber(dishId)) {
+    if (dishId && dishId !== 'NEW') {
       dispatch(fetchDish({ restId: restaurant.credId, dishId }));
     }
   }, [dishId]);
@@ -145,7 +145,7 @@ const DishForm = ({
                     control={control}
                     render={({ field }) => (
                       <Textarea
-                        placeholder="Restaurant Description"
+                        placeholder="Description"
                         {...field}
                       />
                     )}

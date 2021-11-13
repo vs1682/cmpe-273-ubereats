@@ -52,6 +52,10 @@ const RestaurantProfileForm = () => {
       phone: profile.phone,
       timing: profile.timing
     });
+
+    if (profile.deliveryModeAllowed) {
+      setDeliveryModeAllowed(true);
+    }
   }, [profile]);
 
   return (
