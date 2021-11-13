@@ -69,7 +69,7 @@ RestaurantService.findAll = async (query) => {
       allSearchedRestaurants.forEach(r => {
         r.isFavorite = false;
 
-        if (customerFavoriteRestaurantIds.includes(r.credId)) {
+        if (customerFavoriteRestaurantIds.find(fav => fav.equals(r.credId))) {
           r.isFavorite = true;
         }
       });

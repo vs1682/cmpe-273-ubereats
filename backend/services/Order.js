@@ -35,7 +35,7 @@ OrderService.create = async (data) => {
     if (!err) {
       const { orderId } = createdOrder;
       const orderItems = dishes.map(({ dishId, quantity }) => {
-        return [orderId, dishId, quantity];
+        return {orderId, dishId, quantity};
       });
 
       return Order.insertOrderItems(orderItems);
@@ -100,7 +100,7 @@ OrderService.findAllByRestaurant = async (query) => {
 
       if (!errRest && !errDish) {
         const customerMap = _.keyBy(customers, 'credId');
-        const dishMap = _.keyBy(dishes, 'id');
+        const dishMap = _.keyBy(dishes, '_id');
         const orderedDishes = _.groupBy(orderItems, 'orderId');
 
         const allOrders = orders.map(o => {
@@ -140,12 +140,14 @@ OrderService.findAllByCustomer = async (query) => {
       const dishIds = orderItems.map(i => i.dishId);
       const [[errRest, restaurants], [errDish, dishes]] = await Promise.all([
         Restaurant.findMultiple(restIds),
-        Dish.findMultipleRestaurantDishes(restIds, dishIds)
+        Dish.findMultipleRestaurantDishes(dishIds)
       ]);
 
       if (!errRest && !errDish) {
         const restaurantMap = _.keyBy(restaurants, 'credId');
-        const dishMap = _.keyBy(dishes, 'id');
+        // TODO: remove _id and try to use id instead. Try to send id from
+        // model
+        const dishMap = _.keyBy(dishes, '_id');
         const orderedDishes = _.groupBy(orderItems, 'orderId');
 
         const allOrders = orders.map(o => {
