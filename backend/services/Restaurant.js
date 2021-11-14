@@ -39,12 +39,12 @@ RestaurantService.findAll = async (query) => {
   }
 
   const [err, restaurants] = await Restaurant.findAll(finalFilters);
+  let allSearchedRestaurants = restaurants;
   let errDishes, dishes = [];
   if (finalFilters.types || finalFilters.searchText) {
     [errDishes, dishes] = await Dish.findAll(null, finalFilters);
+    allSearchedRestaurants = [];
   }
-  
-  let allSearchedRestaurants = restaurants;
 
   if (!errDishes) {
     const dishMatchedRestaurantIds = dishes.map(d => d.restId);
@@ -52,9 +52,7 @@ RestaurantService.findAll = async (query) => {
       const [errDishMatchedRest, dishMatchedRestaurants] = await Restaurant.findMultiple(dishMatchedRestaurantIds);
 
       if (!errDishMatchedRest) {
-        allSearchedRestaurants = _.uniqBy([...restaurants, ...dishMatchedRestaurants], 'credId');
-
-        console.log('----allSearchedRestaurants---', allSearchedRestaurants);
+        allSearchedRestaurants = _.uniqWith([...restaurants, ...dishMatchedRestaurants], (r1, r2) => r1.credId.equals(r2.credId));
       }
     }
   }

@@ -174,18 +174,18 @@ Dish.findAll = (restId, filters) => {
   // let values = [];
   // let addConnectors = false;
 
-  let match = {};
+  let match = [];
 
   if (restId) {
-    match.restId = mongoose.Types.ObjectId(restId);
+    match.push({ restId: mongoose.Types.ObjectId(restId) });
     // sqlQuery += ' where restId = ?';
     // values.push(restId);
     // addConnectors = true;
   }
 
   if (filters) {
-    if (filters.types) {
-      match.type = filters.types;
+    if (filters.types && filters.types.length > 0) {
+      match.push({ type: { $in: filters.types.map(mongoose.Types.ObjectId) } });
       // const connectingText = addConnectors ? ' and' : ' where';
       // sqlQuery += connectingText + ' type in (?)';
       // values.push(filters.types);
@@ -193,15 +193,17 @@ Dish.findAll = (restId, filters) => {
     }
 
     if (filters.searchText) {
-      match.name = new RegExp(filters.searchText,'i');
+      match.push({ name: new RegExp(filters.searchText,'i') });
       // const connectingText = addConnectors ? ' and' : ' where';
       // sqlQuery += `${connectingText} (name like '%${filters.searchText}%')`;
     }
   }
 
+  const matchConstraints = match.length > 0 ? { $and: match } : {};
+
   return new Promise(resolve => {
     DishModel.aggregate()
-    .match(match)
+    .match(matchConstraints)
     .lookup({
       from: 'images',
       localField: 'imageId',
