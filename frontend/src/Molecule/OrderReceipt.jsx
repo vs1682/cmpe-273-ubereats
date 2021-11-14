@@ -1,9 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { useCart } from 'react-use-cart';
-import { Link } from 'react-router-dom';
 import { styled, useStyletron } from 'baseui';
-import { Button } from 'baseui/button';
 import {
   Modal,
   ModalHeader,
@@ -63,7 +59,7 @@ const OrderReceipt = ({
           </Centered>
           <div>{dish.name}</div>
         </div>
-        <Space size={2} />
+        <Space />
       </div>
     );
   }
@@ -90,6 +86,13 @@ const OrderReceipt = ({
       </div>
     );
   }
+
+  const renderNoteForRestaurant = () => (
+    <div className={css({ color: 'black' })}>
+      <h3>Notes</h3>
+      <p>{order.note}</p>
+    </div>
+  )
 
   return (
     <Modal
@@ -118,6 +121,12 @@ const OrderReceipt = ({
         <Divider size={1} />
         <Space />
         {dishes.map(renderDishItem)}
+        {order.note && (
+          <>
+            <Divider size={1} />
+            {renderNoteForRestaurant()}
+          </>
+        )}
         <Divider size={1} />
         <Space size={2} />
         {renderAmountBreak()}

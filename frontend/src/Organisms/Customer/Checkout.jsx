@@ -6,6 +6,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { styled, useStyletron } from 'baseui';
 import { RadioGroup, Radio } from 'baseui/radio';
 import { Button, SIZE, SHAPE } from 'baseui/button';
+import { Textarea } from 'baseui/textarea';
 import { useSnackbar } from 'baseui/snackbar';
 
 import AddressItem from '../../Atoms/AddressItem';
@@ -31,6 +32,7 @@ const Checkout = () => {
   const [css] = useStyletron();
   const { emptyCart, items, cartTotal } = useCart();
   const { enqueue } = useSnackbar();
+  const [noteForStore, setNoteForStore] = useState('');
   const [openAddAddressModal, setOpenAddAddressModal] = useState(false);
   const user = useSelector(state => state.user);
   const restaurant = useSelector(state => state.restaurant.selected || {});
@@ -68,6 +70,7 @@ const Checkout = () => {
       restId: restaurant.credId,
       dishes: items.map(i => ({dishId: i.id, quantity: i.quantity})),
       amount: getAmountBreakup().total,
+      note: noteForStore,
       status: orderStatusMap['NEW'].id,
       deliveryMode: restaurant.deliveryModeAllowed,
       orderedAt: new Date()
@@ -151,6 +154,16 @@ const Checkout = () => {
     );
   }
 
+  const renderSpecialInstructionBox = () => {
+    return (
+      <Textarea
+        placeholder="Add a note for the store"
+        onChange={e => setNoteForStore(e.target.value)}
+        value={noteForStore}
+      />
+    )
+  }
+
   const renderOrderDetails = () => {
     return (
       <div className={css({ width: '50%', height: '100%', margin: '0 25% 0 64px' })}>
@@ -160,6 +173,8 @@ const Checkout = () => {
         <Divider />
         <Space />
         {renderOrderItems()}
+        <Space />
+        {renderSpecialInstructionBox()}
       </div>
     );
   }
