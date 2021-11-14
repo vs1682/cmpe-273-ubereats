@@ -15,7 +15,8 @@ OrderService.create = async (data) => {
     deliveryMode,
     orderedAt,
     dishes,
-    status
+    status,
+    note
   } = data;
 
   let err, createdOrder;
@@ -27,7 +28,8 @@ OrderService.create = async (data) => {
       amount,
       deliveryMode,
       orderedAt,
-      status
+      status,
+      note
     });
 
     [err, createdOrder] = await Order.create(order);

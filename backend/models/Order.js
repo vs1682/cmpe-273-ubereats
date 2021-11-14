@@ -9,6 +9,7 @@ const OrderSchema = new Schema({
   custId: {type: Schema.Types.ObjectId, ref: 'Customer', required: true},
   restId: {type: Schema.Types.ObjectId, ref: 'Restaurant', required: true},
   amount: Number,
+  note: String,
   deliveryMode: Boolean,
   orderedAt: Date,
   status: {type: Schema.Types.ObjectId, ref: 'OrderStatus'}
@@ -27,6 +28,7 @@ const Order = function(order) {
   this.custId = order.custId;
   this.restId = order.restId;
   this.amount = order.amount;
+  this.note = order.note;
   this.deliveryMode = order.deliveryMode;
   this.orderedAt = order.orderedAt;
   this.status = order.status;
@@ -164,6 +166,8 @@ Order.findAllByCustomer = ({ custId, filters }) => {
 
   return new Promise(resolve => {
     OrderModel.find(match)
+    .limit(filters.limit)
+    .skip((filters.page - 1) * filters.limit)
     .lean({ virtuals: true })
     .exec((err, result) => {
       if (err) {
@@ -179,8 +183,8 @@ Order.findAllByCustomer = ({ custId, filters }) => {
 }
 
 Order.findAllByRestaurant = ({ restId, filters }) => {
-  let sqlQuery = 'select * from orders where restId = ?';
-  let values = [restId];
+  // let sqlQuery = 'select * from orders where restId = ?';
+  // let values = [restId];
   let match = { restId };
 
   if (filters) {
@@ -193,6 +197,8 @@ Order.findAllByRestaurant = ({ restId, filters }) => {
 
   return new Promise(resolve => {
     OrderModel.find(match)
+    .limit(filters.limit)
+    .skip((filters.page - 1) * filters.limit)
     .lean({ virtuals: true })
     .exec((err, result) => {
       if (err) {
