@@ -1,13 +1,12 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
 import { useStyletron } from 'baseui';
-import { StyledLink } from "baseui/link";
 
 import Centered from '../Atoms/Centered';
 import Space from '../Atoms/Space';
-import OrderStatus from './OrderFilter';
-import { Button } from 'baseui/button';
+import OrderStatus, { SIZE as ORDER_FILTER_SIZE } from './OrderFilter';
+import { Button, SIZE as BUTTON_SIZE } from 'baseui/button';
 import { Link } from 'react-router-dom';
 import { URLS } from '../utils/constants';
 import { updateOrderStatus } from '../store/thunks/order';
@@ -21,6 +20,7 @@ const OrderItem = ({
 }) => {
   const dispatch = useDispatch();
   const [css] = useStyletron();
+  const orderStatuses = useSelector(state => state.order.statuses);
 
   const renderDishItem = (dish) => {
     return (
@@ -47,6 +47,9 @@ const OrderItem = ({
 
   const profilePicUrl = restaurant ? restaurant.profilePicUrl : customer.profilePicUrl;
   const name = restaurant ? restaurant.name : customer.fullname;
+
+  const orderStatusMap = _.keyBy(orderStatuses, 'name');
+  const shouldShowCancelButton = order.status == orderStatusMap['NEW'].id;
 
   return (
     <div className={css({ display: 'flex' })}>
@@ -80,15 +83,30 @@ const OrderItem = ({
       </div>
       <div className={css({ flex: 1 })}>
         {restaurant && (
-          <Link to={`${URLS.restaurant.base}/${restaurant.credId}`}>
-            <Button>View Store</Button>
-          </Link>
+          <>
+            <Link to={`${URLS.restaurant.base}/${restaurant.credId}`}>
+              <Button size={BUTTON_SIZE.compact}>View Store</Button>
+            </Link>
+            {shouldShowCancelButton && (<Button
+              className={css({ marginLeft: '4px' })}
+              size={BUTTON_SIZE.compact}
+              onClick={() => dispatch(
+                updateOrderStatus({
+                  orderId: order.orderId,
+                  status: orderStatusMap['CANCELLED'].id
+                })
+              )}
+            >
+              Cancel Order
+            </Button>)}
+          </>
         )}
         {customer && (
-          <div className={css({ width: '200px' })}>
+          <div className={css({ width: '160px' })}>
             <OrderStatus
               status={order.status}
               onChange={value => dispatch(updateOrderStatus({ orderId: order.orderId, status: value }))}
+              size={ORDER_FILTER_SIZE.compact}
             />
           </div>
         )}
