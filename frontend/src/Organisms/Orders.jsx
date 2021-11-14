@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useStyletron } from 'baseui';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
+import { Pagination } from 'baseui/pagination';
+import { Select, SIZE as SELECT_SIZE } from 'baseui/select';
 
 import Divider from '../Atoms/Divider';
 import Space from '../Atoms/Space';
@@ -14,8 +16,9 @@ import {
   fetchOrderByCustomer,
   fetchOrderByRestaurant
 } from '../store/thunks/order';
-import { setOrderFilter } from '../store/slices/filters';
+import { setOrderFilter, setOrderPagination } from '../store/slices/filters';
 import { USER_TYPE } from '../utils/constants';
+import Centered from '../Atoms/Centered';
 
 const Orders = () => {
   const dispatch = useDispatch();
@@ -66,10 +69,27 @@ const Orders = () => {
     </>
   )
 
+  const renderPagination = () => (
+    <Centered horizontal>
+      <Pagination
+        numPages={20}
+        currentPage={orderFilters.page}
+        onPageChange={({ nextPage }) => {
+          dispatch(setOrderPagination({
+            page: Math.min(Math.max(nextPage, 1), 20)
+          }));
+        }}
+      />
+    </Centered>
+  );
+
   const isCustomer = user.accountRole === USER_TYPE.customer;
   const renderOrderItems = isCustomer
     ? renderOrderItemsForCustomer
     : renderOrderItemsForRestaurant;
+
+  const pageSizes = [2, 5, 10];
+  const pageOptions = pageSizes.map(ps => ({label: `show ${ps} orders per page`, id: ps}));
 
   return (
     <div className={css({ padding: '64px' })}>
@@ -78,15 +98,27 @@ const Orders = () => {
         justifyContent: 'space-between',
         alignItems: 'center'
       })}>
-        <h1>Orders</h1>
+        <div className={css({display: 'flex', alignItems: 'center'})}>
+          <h1 className={css({marginRight: '8px'})}>Orders</h1>
+          <Select
+            size={SELECT_SIZE.compact}
+            value={pageOptions.filter(o => o.id === orderFilters.limit)}
+            options={pageOptions}
+            onChange={params => dispatch(
+              setOrderPagination({ limit: _.get(params, 'option.id') })
+            )}
+          />
+        </div>
         <div className={css({ width: '200px' })}>
           <OrderFilter
             status={orderFilters.status}
             onChange={value => dispatch(setOrderFilter(value))}
+            size={SELECT_SIZE.compact}
           />
         </div>
       </div>
       {orders.map(renderOrderItems)}
+      {renderPagination()}
       {isCustomer && receiptForOrder && (
         <OrderReceipt
           {...receiptForOrder}

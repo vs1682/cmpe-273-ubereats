@@ -11,7 +11,10 @@ export const filterSlice = createSlice({
       searchText: '',
       types: []
     },
-    order: {}
+    order: {
+      page: 1,
+      limit: 5
+    }
   },
   reducers: {
     setRestaurantFilters: (state, action) => {
@@ -28,7 +31,14 @@ export const filterSlice = createSlice({
     } ,
     setOrderFilter: (state, action) => {
       state.order = {
+        ...state.order,
         status: action.payload
+      }
+    },
+    setOrderPagination: (state, action) => {
+      state.order = {
+        ...state.order,
+        ...action.payload
       }
     }
   }
@@ -38,7 +48,8 @@ export const filterSlice = createSlice({
 export const {
   setRestaurantFilters,
   setDishFilters,
-  setOrderFilter
-} = filterSlice.actions
+  setOrderFilter,
+  setOrderPagination
+} = filterSlice.actions;
 
 export default filterSlice.reducer
