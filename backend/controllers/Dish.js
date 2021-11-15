@@ -16,7 +16,7 @@ DishController.create = async (req, res) => {
     [imgErr, imgData] = await ImageService.create({ url: req.body.imageUrl });
   }
 
-  const [err, data] = await DishService.create({ ...req.body, imageId: imgData ? imgData._id : null });
+  const [err, data] = await DishService.create({ ...req.body, imageId: imgData ? imgData.id : null });
 
   if (imgErr || err) {
     res.status(500).send({

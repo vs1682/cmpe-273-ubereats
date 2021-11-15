@@ -1,43 +1,31 @@
 import { API_URL } from '../utils/constants';
 import { changeIdKey } from '../utils/helper';
+import { SecureAPI } from './API';
 
 const CountriesApi = {};
 
+const api = new SecureAPI(API_URL);
+
 CountriesApi.getCountries = async () => {
-  const response = await fetch(`${API_URL}/api/countries`, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+  const response = await api.get('/api/countries');
 
   return changeIdKey(await response.json());
 }
 
 CountriesApi.getStates = async (country) => {
-  const response = await fetch(`${API_URL}/api/countries/${country}`, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+  const response = await api.get(`/api/countries/${country}`);
 
   return changeIdKey(await response.json());
 }
 
 CountriesApi.getCities = async (country, state) => {
-  const response = await fetch(`${API_URL}/api/countries/${country}/${state}`, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+  const response = await api.get(`/api/countries/${country}/${state}`);
 
   return changeIdKey(await response.json());
 }
 
 CountriesApi.getDetails = async (country, state, city) => {
-  let url = `${API_URL}/api/countries/details?`;
+  let url = `/api/countries/details?`;
 
   if (country) {
     url = `${url}country=${country}`;
@@ -50,12 +38,7 @@ CountriesApi.getDetails = async (country, state, city) => {
       url = `${url}&city=${city}`;
     }
 
-    const response = await fetch(url, {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    const response = await api.get(url);
 
     return changeIdKey(await response.json());
   }

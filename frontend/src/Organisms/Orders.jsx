@@ -114,6 +114,7 @@ const Orders = () => {
             status={orderFilters.status}
             onChange={value => dispatch(setOrderFilter(value))}
             size={SELECT_SIZE.compact}
+            isFilter
           />
         </div>
       </div>

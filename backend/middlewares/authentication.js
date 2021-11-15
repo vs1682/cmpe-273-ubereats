@@ -1,21 +1,43 @@
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import passport from 'passport';
+import pJWT from 'passport-jwt';
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+const JWTstrategy = pJWT.Strategy;
+const ExtractJWT = pJWT.ExtractJwt;
 
-  if (token == null)
-    return res.sendStatus(401);
+passport.use(new JWTstrategy(
+  {
+    secretOrKey: process.env.TOKEN_SECRET,
+    jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken()
+  },
+  async (token, done) => {
+    console.log('----ATLEAST HERE----',process.env.TOKEN_SECRET);
+    try {
+      console.log('----TOKEN----', token);
+      return done(null, token.user);
+    } catch (error) {
+      console.log('----TOKEN ERROR----', error);
+      done(error);
+    }
+  }
+));
 
-  jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
-    if (err)
-      return res.sendStatus(403);
+// const authenticateToken = (req, res, next) => {
+//   const authHeader = req.headers['authorization'];
+//   const token = authHeader && authHeader.split(' ')[1];
 
-    req.user = user
+//   if (token == null)
+//     return res.sendStatus(401);
 
-    next();
-  });
-}
+//   jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
+//     if (err)
+//       return res.sendStatus(403);
 
-export default authenticateToken;
+//     req.user = user
+
+//     next();
+//   });
+// }
+
+// export default authenticateToken;

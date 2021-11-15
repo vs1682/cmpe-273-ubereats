@@ -22,6 +22,7 @@ RestaurantController.create = async (req, res) => {
 }
 
 RestaurantController.findById = async (req, res) => {
+  console.log('-----CHECK-----')
   if (!req.body) {
     res.status(400).send({
       message: "Required fields not present"
@@ -43,6 +44,7 @@ RestaurantController.findById = async (req, res) => {
 }
 
 RestaurantController.findAll = async (req, res) => {
+  console.log('-----CHECK-----')
   const [err, data] = await RestaurantService.findAll(req.query);
 
   if (err) {

@@ -6,9 +6,18 @@ import { Select, SIZE } from "baseui/select";
 const OrderFilter = ({
   status,
   onChange,
-  size = SIZE.default
+  size = SIZE.default,
+  isFilter
 }) => {
-  const statuses = useSelector(state => state.order.statuses);
+  const orderStatuses = useSelector(state => state.order.statuses);
+  const statuses = [...orderStatuses];
+  if (isFilter) {
+    statuses.unshift({ id: 'ALL', name: 'ALL' });
+    if (!status) {
+      status = 'ALL';
+    }
+  }
+
   const options = statuses.map(s => ({ id: s.id, label: s.name }));
   
   return (

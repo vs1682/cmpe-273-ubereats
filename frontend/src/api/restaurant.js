@@ -1,45 +1,34 @@
 import { API_URL } from '../utils/constants';
 import { changeIdKey } from '../utils/helper';
+import { SecureAPI } from './API';
 
 const RestaurantApi = {};
+const api = new SecureAPI(API_URL);
 
 RestaurantApi.getProfile = async (id) => {
-  const response = await fetch(`${API_URL}/api/restaurant/profile/${id}`, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+  const response = await api.get(`/api/restaurant/profile/${id}`);
 
   return changeIdKey(await response.json());
 }
 
 RestaurantApi.updateProfile = async (data) => {
-  const response = await fetch(`${API_URL}/api/restaurant/profile/${data.credId}`, {
-    method: 'put',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  });
+  const response = await api.put(
+    `/api/restaurant/profile/${data.credId}`,
+    {},
+    JSON.stringify(data)
+  );
 
   return changeIdKey(await response.json());
 }
 
 RestaurantApi.getAll = async (customerId, filters) => {
-  console.log('----filters-----', filters)
-  let url = `${API_URL}/api/restaurant?customerId=${customerId}`;
+  let url = `/api/restaurant?customerId=${customerId}`;
 
   if (filters) {
     url += `&filters=${JSON.stringify(filters)}`;
   }
 
-  const response = await fetch(url, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+  const response = await api.get(url);
 
   return changeIdKey(await response.json());
 }

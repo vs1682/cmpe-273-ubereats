@@ -1,4 +1,5 @@
 import CustomerService from '../services/Customer.js';
+import kafka from '../kafka/client.js';
 
 const CustomerController = {};
 
@@ -11,16 +12,28 @@ CustomerController.update = async (req, res) => {
 
   const { id } = req.params;
 
-  const [err, data] = await CustomerService.update({ credId: id, ...req.body });
+  kafka.make_request(
+    'post_ubereats_data',
+    {
+      service: 'customer',
+      method: 'update',
+      data: [{ credId: id, ...req.body }]
+    },
+    function(err,results){
+      console.log('KAFKA MAKE REQUEST CALLBACK');
+      console.log('RESULTS: ', results);
+      if (err){
+        console.log("ERROR: ", err);
+        return res.status(500).send({
+          message:
+            err.message || "Some error occurred while updating the Customer."
+        });
+      }else{
+        return res.json(results);
+      } 
+  });
 
-  if (err) {
-    res.status(500).send({
-      message:
-        err.message || "Some error occurred while updating the Customer."
-    });
-  }
-
-  res.json(data);
+  // const [err, data] = await CustomerService.update({ credId: id, ...req.body });
 }
 
 CustomerController.getProfile = async (req, res) => {

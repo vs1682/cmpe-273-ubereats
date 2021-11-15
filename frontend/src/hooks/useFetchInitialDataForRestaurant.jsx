@@ -25,7 +25,7 @@ const useFetchInitialDataForRestaurant = () => {
   useEffect(() => {
     if (orderStatuses && orderStatuses.length > 0) {
       const orderStatusMap = _.keyBy(orderStatuses, 'name');
-      dispatch(setOrderFilter(orderStatusMap['NEW'].id));
+      // dispatch(setOrderFilter(orderStatusMap['NEW'].id));
     }
   }, [orderStatuses]);
 }
